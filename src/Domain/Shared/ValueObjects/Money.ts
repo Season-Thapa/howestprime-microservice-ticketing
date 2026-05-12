@@ -1,8 +1,8 @@
 import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
 
 export class InvalidMoneyException extends DomainException {
-    constructor(value: number) {
-        super(`Money has invalid value: '${value}'`);
+    constructor() {
+        super(`Amount must be greater than or equal to 0`);
     }
 }
 export class Money  extends ValueObject {
@@ -19,12 +19,12 @@ export class Money  extends ValueObject {
     }
 
     protected validate(): void {
-     
-
+     if(this._value < 0){
+        throw new InvalidMoneyException();
+     }
     }
 
     get money(): number {
-
         return this._value;
     }
     get totalMoney(): number {

@@ -1,10 +1,10 @@
 import {AggregateRoot,UUIDEntityId} from "@/Domain/Shared/mod.ts";
-import {MovieTitle} from "../Shared/ValueObjects/MovieTitle.ts";
-import {AgeRating} from "../Shared/ValueObjects/AgeRating.ts";
-import {Genre, InvalidGenreException} from "../Shared/ValueObjects/Genre.ts";
-import {MovieDuration} from "../Shared/ValueObjects/MovieDuration.ts";
-import {PosterUrl} from "../Shared/ValueObjects/PosterUrl.ts";
-import {Money} from "../Shared/ValueObjects/Money.ts";
+import {MovieTitle} from "./ValueObjects/MovieTitle.ts";
+import {AgeRating} from "./ValueObjects/AgeRating.ts";
+import {Genre, InvalidGenreException} from "./ValueObjects/Genre.ts";
+import {MovieDuration} from "./ValueObjects/MovieDuration.ts";
+import {PosterUrl} from "./ValueObjects/PosterUrl.ts";
+import {Money} from "../../Shared/ValueObjects/Money.ts";
 
 export class MovieId extends UUIDEntityId {
     private constructor(id?: string) {

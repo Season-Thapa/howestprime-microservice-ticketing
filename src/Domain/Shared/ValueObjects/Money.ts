@@ -24,12 +24,10 @@ export class Money  extends ValueObject {
      }
     }
 
-    get money(): number {
+    get amount(): number {
         return this._value;
     }
-    get totalMoney(): number {
-        return this._value;
-    }
+
     equals(other: Money): boolean {
         return other._value === this._value;
     }

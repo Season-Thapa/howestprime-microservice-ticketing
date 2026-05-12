@@ -1,7 +1,7 @@
 import { Entity, UUIDEntityId } from "@/Domain/Shared/mod.ts";
 import { Money } from "../../../Shared/ValueObjects/Money.ts";
 import { MovieInfo } from "../ValueObjects/MovieInfo.ts";
-import { Seat } from "../ValueObjects/Seat.ts";
+import {Seat, VisitorType} from "../ValueObjects/Seat.ts";
 export class TicketId extends UUIDEntityId {
     private constructor(id?: string) {
         super(id);
@@ -39,17 +39,20 @@ export class Ticket extends Entity<TicketId> {
         movieInfo: MovieInfo,
         seat: Seat,
         room: string,
-        price: Money,
         showtime: Date
     ): Ticket {
-        return new Ticket(
+        const multiplier = seat.visitorType === VisitorType.Discounted ? 0.9 : 1.0;
+        const ticketPrice = Money.create(movieInfo.price.amount * multiplier);
+        const ticket = new Ticket(
             TicketId.create(),
             movieInfo,
             seat,
             room,
-            price,
+            ticketPrice,
             showtime
         );
+        ticket.validate();
+        return ticket;
     }
 
     get movieInfo(): MovieInfo {

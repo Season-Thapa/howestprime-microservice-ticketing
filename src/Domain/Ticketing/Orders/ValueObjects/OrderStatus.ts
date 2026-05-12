@@ -1,5 +1,5 @@
 import { DomainException,ValueObject} from '@/Domain/Shared/mod.ts';
-export class InvalidStatusTransitionException extends DomainException {
+export class InvalidOrderStatusTransitionException extends DomainException {
     constructor(from: OrderStatus, to: OrderStatus, reason?: string) {
         const baseMessage = `Invalid order status transition from "${from}" to "${to}".`;
         const fullMessage = reason
@@ -41,7 +41,7 @@ export class OrderStatus extends ValueObject {
             } else {
                 reason = 'This transition violates order  rules.';
             }
-            throw new InvalidStatusTransitionException(this, targetStatus, reason);
+            throw new InvalidOrderStatusTransitionException(this, targetStatus, reason);
         }
         return targetStatus;
     }

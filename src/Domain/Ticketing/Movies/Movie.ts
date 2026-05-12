@@ -48,8 +48,8 @@ export class Movie extends AggregateRoot<MovieId> {
         genre: Genre[],
         movieDuration: MovieDuration,
         posterUrl: PosterUrl,
-        price: Money
     ): Movie {
+        const calculatedPrice = Money.create(movieDuration.duration * 0.15);
         const movie = new Movie(
             id,
             title,
@@ -57,8 +57,9 @@ export class Movie extends AggregateRoot<MovieId> {
             genre,
             movieDuration,
             posterUrl,
-            price
+            calculatedPrice
         );
+        movie.validate();
         return movie;
     }
     get title(): MovieTitle {

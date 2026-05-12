@@ -1,30 +1,31 @@
 import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
 export class InvalidAgeRatingException extends DomainException {
-    constructor(value: number) {
-        super(`AgeRating has invalid value: '${value}'`);
+    constructor(value: string) {
+        super(`AgeRating has invalid value: '${String(value)}'`);
     }
 }
 export class AgeRating  extends ValueObject {
-    private readonly _value: number;
-    private constructor(value: number) {
+    private readonly _value: string;
+    private constructor(value: string) {
         super();
         this._value = value;
     }
 
-    static create(value: number): AgeRating {
+    static create(value: string): AgeRating {
         const ageRating = new AgeRating(value);
         ageRating.validate();
         return ageRating;
     }
 
     protected validate(): void {
-        if (!this._value || this._value === 0) {
+        const trimmedValue = this._value?.trim();
+        if (!trimmedValue || trimmedValue === "") {
             throw new InvalidAgeRatingException(this._value);
         }
 
     }
 
-    get value(): number {
+    get value(): string {
 
         return this._value;
     }

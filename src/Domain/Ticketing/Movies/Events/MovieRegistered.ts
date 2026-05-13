@@ -9,8 +9,8 @@ export class MovieRegistered extends MovieDomainEvent {
     private readonly _title: string;
     private readonly _releaseYear: number;
     private readonly _duration: number;
-    private readonly _genres: [];
-    private readonly _actors: [];
+    private readonly _genres: string[];
+    private readonly _actors: string[];
     private readonly _ageRating: string;
     private readonly _posterUrl: string;
     private readonly _occurredOn: Date;
@@ -20,8 +20,8 @@ export class MovieRegistered extends MovieDomainEvent {
         title: string,
         releaseYear: number,
         duration: number,
-        genres: [],
-        actors: [],
+        genres: string[],
+        actors: string[],
         ageRating: string,
         posterUrl: string,
     ) {
@@ -41,8 +41,8 @@ export class MovieRegistered extends MovieDomainEvent {
         title: string,
         releaseYear: number,
         duration: number,
-        genres: [],
-        actors: [],
+        genres: string[],
+        actors: string[],
         ageRating: string,
         posterUrl: string,
     ): MovieRegistered {
@@ -74,11 +74,11 @@ export class MovieRegistered extends MovieDomainEvent {
         return this._duration;
     }
 
-    get genres(): [] {
+    get genres(): string[] {
         return this._genres;
     }
 
-    get actors(): [] {
+    get actors(): string[] {
         return this._actors;
     }
 

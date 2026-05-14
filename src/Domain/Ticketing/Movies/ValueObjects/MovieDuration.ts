@@ -27,7 +27,9 @@ export class MovieDuration  extends ValueObject {
     }
 
     get duration(): number {
-
+        if (this._value > 100) {
+            return this._value + 10;
+        }
         return this._value;
     }
     get totalDuration(): number {

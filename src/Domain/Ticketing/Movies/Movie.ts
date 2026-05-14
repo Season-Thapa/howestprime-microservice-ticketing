@@ -7,11 +7,11 @@ import {PosterUrl} from "./ValueObjects/PosterUrl.ts";
 import {Money} from "../../Shared/ValueObjects/Money.ts";
 
 export class MovieId extends UUIDEntityId {
-    private constructor(id?: string) {
+    private constructor(id: string) {
         super(id);
     }
 
-    static create(value?: string): MovieId {
+    static create(value: string): MovieId {
         return new MovieId(value);
     }
 }
@@ -60,6 +60,7 @@ export class Movie extends AggregateRoot<MovieId> {
             calculatedPrice
         );
         movie.validate();
+
         return movie;
     }
     get title(): MovieTitle {

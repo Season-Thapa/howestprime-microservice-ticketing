@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Deno check
+        run: deno check src/
+
+      - name: Deno lint
+        run: deno lint src
+
+      - name: Run unit tests
+        run: deno test --allow-all
+
+  code-coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run tests with coverage
+        run: deno test --coverage=coverage --allow-all
+
+      - name: Check coverage threshold
+        run: |
+          coverage_report="$(deno coverage --exclude=tests coverage)"
+          echo "$coverage_report"
+
+          COVERAGE="$(echo "$coverage_report" | grep "All files" | awk -F'|' '{print $3}' | sed 's/\x1B\[[0-9;]*m//g' | tr -d '[:space:]')"
+          COVERAGE_INT="${COVERAGE%.*}"
+
+          if [[ $COVERAGE_INT -lt 95 ]]; then
+            echo "Code coverage is below threshold of 95%"
+            exit 1
+          fi
+
+          echo "Code coverage meets threshold of 95%"

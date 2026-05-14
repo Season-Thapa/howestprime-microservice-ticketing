@@ -40,15 +40,19 @@ export class SaveMovieController implements WebApiController {
 
     }
     private validateBody(body: unknown): boolean {
+        if (typeof body !== 'object' || body === null) {
+            return false;
+        }
+
+        const payload = body as Record<string, unknown>;
+
         return (
-            body !== null &&
-            body !== undefined &&
-            typeof body.movieId === 'string' &&
-            typeof body.title === 'string' &&
-            typeof body.duration === 'number' &&
-            typeof body.ageRating === 'string' &&
-            Array.isArray(body.genres) &&
-            typeof body.posterUrl === 'string'
+            typeof payload.movieId === 'string' &&
+            typeof payload.title === 'string' &&
+            typeof payload.duration === 'number' &&
+            typeof payload.ageRating === 'string' &&
+            Array.isArray(payload.genres) &&
+            typeof payload.posterUrl === 'string'
         );
     }
 }

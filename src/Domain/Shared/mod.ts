@@ -12,3 +12,4 @@ export { AggregateRoot } from './AggregateRoot.ts';
 export { UUIDEntityId } from './UUIDEntityId.ts';
 export { type Repository } from './Repository.ts';
 export { MathRandomProvider, type RandomProvider } from './RandomProvider.ts';
+export {Money} from './ValueObjects/Money.ts';

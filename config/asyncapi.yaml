@@ -1,155 +1,223 @@
 asyncapi: 3.1.0
 info:
-    title: Howestprime.Ticketing
-    version: 1.0.0
-    description: |
-        This AsyncAPI specification describes the message broker configuration
-        for suggestion create request/response flows in the Howestprime.Ticketing SAAS.
-    x-metadata:
-        BoundedContext: Ticketing
+  title: Howestprime.Ticketing
+  version: 1.0.0
+  description: |
+    This AsyncAPI specification describes the message broker configuration
+    for suggestion create request/response flows in the Howestprime.Ticketing SAAS.
+  x-metadata:
+    BoundedContext: Ticketing
 
 defaultContentType: application/json
 
 servers:
-    messageBroker:
-        host: '{host}'
-        protocol: amqp
-        description: Local AMQP message broker
-        variables:
-            host:
-                default: localhost:5672
-                description: Host and port of the AMQP broker
-        bindings:
-            amqp:
-                virtualHost: /
+  messageBroker:
+    host: "{host}"
+    protocol: amqp
+    description: Local AMQP message broker
+    variables:
+      host:
+        default: localhost:5672
+        description: Host and port of the AMQP broker
+    bindings:
+      amqp:
+        virtualHost: /
 
 channels:
-    thirdparty.service.suggestions.sendcreatesuggestion:
-        address: thirdparty.service.suggestions.sendcreatesuggestion
-        title: Send create suggestion
-        messages:
-            SuggestionSendCreateSuggestion:
-                $ref: '#/components/messages/SuggestionSendCreateSuggestion'
-        bindings:
-            amqp:
-                is: routingKey
-                exchange:
-                    name: howestprime
-                    type: topic
-                    routingKey: thirdparty.service.suggestions.sendcreatesuggestion
+  thirdparty.service.suggestions.sendcreatesuggestion:
+    address: thirdparty.service.suggestions.sendcreatesuggestion
+    title: Send create suggestion
+    messages:
+      SuggestionSendCreateSuggestion:
+        $ref: "#/components/messages/SuggestionSendCreateSuggestion"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: thirdparty.service.suggestions.sendcreatesuggestion
 
-    howestprime.ticketing.suggestions.created:
-        address: howestprime.ticketing.suggestions.created
-        title: Suggestion created
-        messages:
-            SuggestionCreated:
-                $ref: '#/components/messages/SuggestionCreated'
-        bindings:
-            amqp:
-                is: routingKey
-                exchange:
-                    name: howestprime
-                    type: topic
-                    routingKey: howestprime.ticketing.suggestions.created
+  howestprime.ticketing.suggestions.created:
+    address: howestprime.ticketing.suggestions.created
+    title: Suggestion created
+    messages:
+      SuggestionCreated:
+        $ref: "#/components/messages/SuggestionCreated"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: howestprime.ticketing.suggestions.created
+
+  howestprime.movies.movie.movieregistered:
+    address: howestprime.movies.movie.movieregistered
+    title: Movie registered
+    messages:
+      MovieRegistered:
+        $ref: "#/components/messages/MovieRegistered"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: howestprime.movies.movie.movieregistered
 
 operations:
-    WhenSuggestionSendCreateSuggestion:
-        action: receive
-        channel:
-            $ref: '#/channels/thirdparty.service.suggestions.sendcreatesuggestion'
-        description: |
-            Triggered when an external producer requests suggestion creation.
-            Consumes the message and delegates to the CreateSuggestion command use case.
-        messages:
-            - $ref: '#/channels/thirdparty.service.suggestions.sendcreatesuggestion/messages/SuggestionSendCreateSuggestion'
+  WhenSuggestionSendCreateSuggestion:
+    action: receive
+    channel:
+      $ref: "#/channels/thirdparty.service.suggestions.sendcreatesuggestion"
+    description: |
+      Triggered when an external producer requests suggestion creation.
+      Consumes the message and delegates to the CreateSuggestion command use case.
+    messages:
+      - $ref: "#/channels/thirdparty.service.suggestions.sendcreatesuggestion/messages/SuggestionSendCreateSuggestion"
 
-    sendSuggestionCreated:
-        action: send
-        channel:
-            $ref: '#/channels/howestprime.ticketing.suggestions.created'
-        description: |
-            Triggered after a suggestion is created successfully.
-            Publishes the created suggestion payload for downstream consumers.
-        messages:
-            - $ref: '#/channels/howestprime.ticketing.suggestions.created/messages/SuggestionCreated'
+  sendSuggestionCreated:
+    action: send
+    channel:
+      $ref: "#/channels/howestprime.ticketing.suggestions.created"
+    description: |
+      Triggered after a suggestion is created successfully.
+      Publishes the created suggestion payload for downstream consumers.
+    messages:
+      - $ref: "#/channels/howestprime.ticketing.suggestions.created/messages/SuggestionCreated"
+
+  WhenMovieRegistered:
+    action: receive
+    channel:
+      $ref: "#/channels/howestprime.movies.movie.movieregistered"
+    description: |
+      Triggered when a movie is registered in the Movies microservice.
+      Consumes the message and delegates to the SaveMovie use case.
+    messages:
+      - $ref: "#/channels/howestprime.movies.movie.movieregistered/messages/MovieRegistered"
 
 components:
-    messages:
-        SuggestionSendCreateSuggestion:
-            name: SuggestionSendCreateSuggestion
-            title: Suggestion create request
-            summary: Request message to create a suggestion.
-            payload:
-                $ref: '#/components/schemas/SuggestionSendCreateSuggestionPayload'
+  messages:
+    SuggestionSendCreateSuggestion:
+      name: SuggestionSendCreateSuggestion
+      title: Suggestion create request
+      summary: Request message to create a suggestion.
+      payload:
+        $ref: "#/components/schemas/SuggestionSendCreateSuggestionPayload"
 
-        SuggestionCreated:
-            name: SuggestionCreated
-            title: Suggestion created
-            summary: Event message emitted after a suggestion is created.
-            payload:
-                $ref: '#/components/schemas/SuggestionCreatedPayload'
+    SuggestionCreated:
+      name: SuggestionCreated
+      title: Suggestion created
+      summary: Event message emitted after a suggestion is created.
+      payload:
+        $ref: "#/components/schemas/SuggestionCreatedPayload"
 
-    schemas:
-        SuggestionSendCreateSuggestionPayload:
-            type: object
-            required:
-                - email
-                - title
-                - description
-            properties:
-                email:
-                    type: string
-                    format: email
-                    maxLength: 254
-                    description: Email address of the suggestion author.
-                    example: user@example.com
-                title:
-                    type: string
-                    minLength: 3
-                    maxLength: 120
-                    description: Short title of the suggestion.
-                    example: Improve booking performance
-                description:
-                    type: string
-                    minLength: 10
-                    maxLength: 2000
-                    description: Detailed suggestion text.
-                    example: Cache frequently requested movie data to reduce latency.
+    MovieRegistered:
+      name: MovieRegistered
+      title: Movie registered
+      summary: Event message emitted when a movie is registered in Movies microservice.
+      payload:
+        $ref: "#/components/schemas/MovieRegisteredPayload"
 
-        SuggestionCreatedPayload:
-            type: object
-            required:
-                - suggestionId
-                - email
-                - title
-                - description
-                - occurredOn
-            properties:
-                suggestionId:
-                    type: string
-                    format: uuid
-                    description: Identifier of the created suggestion.
-                    example: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
-                email:
-                    type: string
-                    format: email
-                    maxLength: 254
-                    description: Email address of the suggestion author.
-                    example: user@example.com
-                title:
-                    type: string
-                    minLength: 3
-                    maxLength: 120
-                    description: Short title of the suggestion.
-                    example: Improve booking performance
-                description:
-                    type: string
-                    minLength: 10
-                    maxLength: 2000
-                    description: Detailed suggestion text.
-                    example: Cache frequently requested movie data to reduce latency.
-                occurredOn:
-                    type: string
-                    format: date-time
-                    description: UTC timestamp when the event occurred.
-                    example: '2026-03-24T10:15:30.000Z'
+  schemas:
+    SuggestionSendCreateSuggestionPayload:
+      type: object
+      required:
+        - email
+        - title
+        - description
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: Email address of the suggestion author.
+          example: user@example.com
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+          description: Short title of the suggestion.
+          example: Improve booking performance
+        description:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: Detailed suggestion text.
+          example: Cache frequently requested movie data to reduce latency.
+
+    SuggestionCreatedPayload:
+      type: object
+      required:
+        - suggestionId
+        - email
+        - title
+        - description
+        - occurredOn
+      properties:
+        suggestionId:
+          type: string
+          format: uuid
+          description: Identifier of the created suggestion.
+          example: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: Email address of the suggestion author.
+          example: user@example.com
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+          description: Short title of the suggestion.
+          example: Improve booking performance
+        description:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          description: Detailed suggestion text.
+          example: Cache frequently requested movie data to reduce latency.
+        occurredOn:
+          type: string
+          format: date-time
+          description: UTC timestamp when the event occurred.
+          example: "2026-03-24T10:15:30.000Z"
+
+    MovieRegisteredPayload:
+      type: object
+      required:
+        - movieId
+        - title
+        - duration
+        - genres
+        - ageRating
+        - posterUrl
+      properties:
+        movieId:
+          type: string
+          description: Identifier of the movie.
+          example: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+        title:
+          type: string
+          description: Movie title.
+          example: The Great Booking
+        duration:
+          type: number
+          description: Movie duration in minutes.
+          example: 120
+        genres:
+          type: array
+          items:
+            type: string
+          description: List of genres for the movie.
+          example: [Drama, Thriller]
+        ageRating:
+          type: string
+          description: Age rating for the movie.
+          example: 12+
+        posterUrl:
+          type: string
+          description: URL to the movie poster image.
+          example: https://example.com/poster.jpg

@@ -1,0 +1,94 @@
+import {AggregateRoot,UUIDEntityId} from "@/Domain/Shared/mod.ts";
+import {MovieTitle} from "./ValueObjects/MovieTitle.ts";
+import {AgeRating} from "./ValueObjects/AgeRating.ts";
+import {Genre, InvalidGenreException} from "./ValueObjects/Genre.ts";
+import {MovieDuration} from "./ValueObjects/MovieDuration.ts";
+import {PosterUrl} from "./ValueObjects/PosterUrl.ts";
+import {Money} from "../../Shared/ValueObjects/Money.ts";
+
+export class MovieId extends UUIDEntityId {
+    private constructor(id: string) {
+        super(id);
+    }
+
+    static create(value: string): MovieId {
+        return new MovieId(value);
+    }
+}
+export class Movie extends AggregateRoot<MovieId> {
+    private readonly _title: MovieTitle;
+    private readonly _ageRating: AgeRating;
+    private readonly _genres: Genre[];
+    private readonly _movieDuration: MovieDuration;
+    private readonly _posterUrl: PosterUrl;
+    private readonly _price: Money;
+
+    private constructor(
+        id: MovieId,
+        title: MovieTitle,
+        ageRating: AgeRating,
+        genres: Genre[],
+        movieDuration: MovieDuration,
+        posterUrl: PosterUrl,
+        price: Money
+    ) {
+        super(id);
+        this._title = title;
+        this._ageRating = ageRating;
+        this._genres = genres;
+        this._movieDuration = movieDuration;
+        this._posterUrl = posterUrl;
+        this._price = price;
+    }
+
+    static create(
+        id: MovieId,
+        title: MovieTitle,
+        ageRating: AgeRating,
+        genre: Genre[],
+        movieDuration: MovieDuration,
+        posterUrl: PosterUrl,
+    ): Movie {
+        const calculatedPrice = Money.create(movieDuration.duration * 0.15);
+        const movie = new Movie(
+            id,
+            title,
+            ageRating,
+            genre,
+            movieDuration,
+            posterUrl,
+            calculatedPrice
+        );
+        movie.validate();
+
+        return movie;
+    }
+    get title(): MovieTitle {
+        return this._title;
+    }
+
+    get ageRating(): AgeRating {
+        return this._ageRating;
+    }
+
+    get genres(): Genre[] {
+        return this._genres;
+    }
+
+    get duration(): MovieDuration {
+        return this._movieDuration;
+    }
+
+    get posterUrl(): PosterUrl {
+        return this._posterUrl;
+    }
+
+    get price(): Money {
+        return this._price;
+    }
+    protected validate(): void {
+        if (this._genres.length === 0) {
+            throw new InvalidGenreException("At least one genre must be provided for movie.");
+        }
+    }
+}

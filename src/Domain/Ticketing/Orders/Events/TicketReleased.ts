@@ -5,25 +5,7 @@ export class TicketReleased extends OrderDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
         `${OrderDomainEvent.FQDN_PREFIX}.ticketreleased`,
     );
-    /*
-    OrderId: Id of the order.
-Customer:
 
-    Salutation: Salutation of the customer.
-    Firstname: First name of the customer.
-    Lastname: Last name of the customer.
-    Email: Email address of the customer. The customer object can be null when no customer information is attached.
-
-Tickets: List of released tickets.
-
-    TicketId: Id of the ticket.
-    MovieId: Id of the movie.
-    Room: Room of the screening.
-    SeatNumber: Reserved seat number.
-    VisitorType: standard or discounted.
-    Price: Price of the ticket.
-    Showtime: Date and time of the screening
-     */
     private readonly _orderId: string;
     private readonly _customer: {
         salutation: string;

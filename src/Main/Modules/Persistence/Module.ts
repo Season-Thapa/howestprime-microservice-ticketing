@@ -1,58 +1,34 @@
-import { ServiceCollection, ServiceProvider } from '@domaincrafters/di';
+import { ServiceCollection, ServiceProvider } from "@domaincrafters/di";
 
-import { Config } from '@/Infrastructure/Shared/mod.ts';
-import { Module } from '@/Main/Modules/Shared/mod.ts';
-import {
-    InMemoryContext,
-    InMemoryUnitOfWork,
-} from '@/Infrastructure/Persistence/InMemory/Shared/mod.ts';
+import { Config } from "@/Infrastructure/Shared/mod.ts";
+import { Module } from "@/Main/Modules/Shared/mod.ts";
+import { InMemoryContext, InMemoryUnitOfWork } from "@/Infrastructure/Persistence/InMemory/Shared/mod.ts";
 
-import { PublishDomainEventsInMemoryUnitOfWorkInterceptor } from '@/Infrastructure/Persistence/InMemory/Interceptors/InMemoryUnitOfWorkInterceptors.ts';
-import { AggregateRoot, EntityId, Repository } from '@/Domain/Shared/mod.ts';
-import { InMemoryDomainEventPublisher } from '@/Infrastructure/Events/mod.ts';
-import {
-    PublishDomainEventsMongoDbUnitOfWorkInterceptor,
-} from '@/Infrastructure/Persistence/MongoDb/mod.ts';
-import {
-    MongoDbSuggestionRepository,
-    SuggestionDocumentMapper,
-} from '@/Infrastructure/Persistence/MongoDb/Repositories/mod.ts';
-import {
-    MongoDbGetSuggestionByIdQuery,
-    MongoDbListSuggestionsQuery,
-} from '@/Infrastructure/Persistence/MongoDb/Queries/mod.ts';
-import {
-    MongoDbClient,
-    MongoDbServices,
-    MongoDbUnitOfWork,
-} from '@/Infrastructure/Persistence/MongoDb/Shared/mod.ts';
+import { PublishDomainEventsInMemoryUnitOfWorkInterceptor } from "@/Infrastructure/Persistence/InMemory/Interceptors/InMemoryUnitOfWorkInterceptors.ts";
+import { AggregateRoot, EntityId, Repository } from "@/Domain/Shared/mod.ts";
+import { InMemoryDomainEventPublisher } from "@/Infrastructure/Events/mod.ts";
+import { PublishDomainEventsMongoDbUnitOfWorkInterceptor } from "@/Infrastructure/Persistence/MongoDb/mod.ts";
+import { MongoDbSuggestionRepository, SuggestionDocumentMapper } from "@/Infrastructure/Persistence/MongoDb/Repositories/mod.ts";
+import { MongoDbMovieRepository, MovieDocumentMapper } from "@/Infrastructure/Persistence/MongoDb/Repositories/mod.ts";
+import { MongoDbGetSuggestionByIdQuery, MongoDbListSuggestionsQuery } from "@/Infrastructure/Persistence/MongoDb/Queries/mod.ts";
+import { MongoDbClient, MongoDbServices, MongoDbUnitOfWork } from "@/Infrastructure/Persistence/MongoDb/Shared/mod.ts";
 
 export class Persistence implements Module {
-    add(serviceCollection: ServiceCollection, config: Config): void {
-        console.log('Persistence module added', serviceCollection, config);
+  add(serviceCollection: ServiceCollection, config: Config): void {
+    console.log("Persistence module added", serviceCollection, config);
 
-        MongoDbServices.add(config, serviceCollection, [
-            MongoDbSuggestionRepository.name,
-        ]);
+    MongoDbServices.add(config, serviceCollection, [MongoDbSuggestionRepository.name, MongoDbMovieRepository.name]);
 
-        // Register InMemoryContext as singleton
-        serviceCollection.addSingleton(
-            'InMemoryContext',
-            () => Promise.resolve(new InMemoryContext()),
-        );
+    // Register InMemoryContext as singleton
+    serviceCollection.addSingleton("InMemoryContext", () => Promise.resolve(new InMemoryContext()));
 
-        this.registerRepositories(serviceCollection);
-        this.registerQueries(serviceCollection);
+    this.registerRepositories(serviceCollection);
+    this.registerQueries(serviceCollection);
 
-        serviceCollection.addScoped(
-            InMemoryUnitOfWork.name,
-            async (serviceProvider: ServiceProvider) => {
-                const eventPublisher =
-                    (await serviceProvider.getService<InMemoryDomainEventPublisher>(
-                        'InMemoryDomainEventPublisher',
-                    )).getOrThrow();
+    serviceCollection.addScoped(InMemoryUnitOfWork.name, async (serviceProvider: ServiceProvider) => {
+      const eventPublisher = (await serviceProvider.getService<InMemoryDomainEventPublisher>("InMemoryDomainEventPublisher")).getOrThrow();
 
-                /*
+      /*
                 const repository = (await serviceProvider.getService<InMemoryTournamentRepository>(
                     InMemoryTournamentRepository.name,
                 )).getOrThrow();
@@ -62,73 +38,55 @@ export class Persistence implements Module {
                     )).getOrThrow();
 
                     */
-                const repositories = new Map<string, Repository<AggregateRoot<EntityId>, EntityId>>(
-                    [
-                        //[Tournament.name, repository],
-                        //[TournamentRun.name, tournamentRunRepository],
-                    ],
-                );
+      const repositories = new Map<string, Repository<AggregateRoot<EntityId>, EntityId>>([
+        //[Tournament.name, repository],
+        //[TournamentRun.name, tournamentRunRepository],
+      ]);
 
-                const unitOfWork = new InMemoryUnitOfWork(repositories);
+      const unitOfWork = new InMemoryUnitOfWork(repositories);
 
-                const interceptors = [
-                    new PublishDomainEventsInMemoryUnitOfWorkInterceptor(
-                        unitOfWork,
-                        eventPublisher,
-                    ),
-                ];
+      const interceptors = [new PublishDomainEventsInMemoryUnitOfWorkInterceptor(unitOfWork, eventPublisher)];
 
-                // Set interceptors after construction (needed because interceptor needs reference to unitOfWork)
-                unitOfWork.setInterceptors(interceptors);
+      // Set interceptors after construction (needed because interceptor needs reference to unitOfWork)
+      unitOfWork.setInterceptors(interceptors);
 
-                return unitOfWork;
-            },
-        );
-        serviceCollection.addScoped(
-            MongoDbUnitOfWork.name,
-            async (serviceProvider: ServiceProvider) => {
-                const mongoClient =
-                    (await serviceProvider.getService<MongoDbClient>('MongoDbClient')).getOrThrow();
-                const eventPublisher =
-                    (await serviceProvider.getService<InMemoryDomainEventPublisher>(
-                        'InMemoryDomainEventPublisher',
-                    )).getOrThrow();
-                const suggestionRepository = (await serviceProvider.getService<
-                    MongoDbSuggestionRepository
-                >(
-                    MongoDbSuggestionRepository.name,
-                )).getOrThrow();
+      return unitOfWork;
+    });
+    serviceCollection.addScoped(MongoDbUnitOfWork.name, async (serviceProvider: ServiceProvider) => {
+      const mongoClient = (await serviceProvider.getService<MongoDbClient>("MongoDbClient")).getOrThrow();
+      const eventPublisher = (await serviceProvider.getService<InMemoryDomainEventPublisher>("InMemoryDomainEventPublisher")).getOrThrow();
+      const suggestionRepository = (await serviceProvider.getService<MongoDbSuggestionRepository>(MongoDbSuggestionRepository.name)).getOrThrow();
+
+                const movieRepository = (await serviceProvider.getService<MongoDbMovieRepository>(MongoDbMovieRepository.name)).getOrThrow();
 
                 const unitOfWork = new MongoDbUnitOfWork(mongoClient.session);
                 unitOfWork.registerRepository(suggestionRepository);
+                unitOfWork.registerRepository(movieRepository);
 
-                const interceptors = [
-                    new PublishDomainEventsMongoDbUnitOfWorkInterceptor(
-                        unitOfWork,
-                        eventPublisher,
-                    ),
-                ];
+      const interceptors = [new PublishDomainEventsMongoDbUnitOfWorkInterceptor(unitOfWork, eventPublisher)];
 
-                unitOfWork.setInterceptors(interceptors);
+      unitOfWork.setInterceptors(interceptors);
 
-                return unitOfWork;
-            },
-        );
-    }
+      return unitOfWork;
+    });
+  }
 
-    private registerRepositories(serviceCollection: ServiceCollection): void {
-        serviceCollection.addScoped(
-            MongoDbSuggestionRepository.name,
-            async (serviceProvider: ServiceProvider) => {
-                const mongoClient =
-                    (await serviceProvider.getService<MongoDbClient>('MongoDbClient')).getOrThrow();
-                const mapper = new SuggestionDocumentMapper();
+  private registerRepositories(serviceCollection: ServiceCollection): void {
+    serviceCollection.addScoped(MongoDbSuggestionRepository.name, async (serviceProvider: ServiceProvider) => {
+      const mongoClient = (await serviceProvider.getService<MongoDbClient>("MongoDbClient")).getOrThrow();
+      const mapper = new SuggestionDocumentMapper();
 
-                return new MongoDbSuggestionRepository(mongoClient, mapper);
-            },
-        );
+      return new MongoDbSuggestionRepository(mongoClient, mapper);
+    });
 
-        /*
+    serviceCollection.addScoped(MongoDbMovieRepository.name, async (serviceProvider: ServiceProvider) => {
+      const mongoClient = (await serviceProvider.getService<MongoDbClient>("MongoDbClient")).getOrThrow();
+      const mapper = new MovieDocumentMapper();
+
+      return new MongoDbMovieRepository(mongoClient, mapper);
+    });
+
+    /*
         serviceCollection.addScoped(
             InMemoryTournamentRepository.name,
             async (serviceProvider: ServiceProvider) => {
@@ -140,30 +98,22 @@ export class Persistence implements Module {
             },
         );
         */
-    }
+  }
 
-    private registerQueries(serviceCollection: ServiceCollection): void {
-        serviceCollection.addScoped(
-            MongoDbListSuggestionsQuery.name,
-            async (serviceProvider: ServiceProvider) => {
-                const mongoClient =
-                    (await serviceProvider.getService<MongoDbClient>('MongoDbClient')).getOrThrow();
+  private registerQueries(serviceCollection: ServiceCollection): void {
+    serviceCollection.addScoped(MongoDbListSuggestionsQuery.name, async (serviceProvider: ServiceProvider) => {
+      const mongoClient = (await serviceProvider.getService<MongoDbClient>("MongoDbClient")).getOrThrow();
 
-                return new MongoDbListSuggestionsQuery(mongoClient);
-            },
-        );
+      return new MongoDbListSuggestionsQuery(mongoClient);
+    });
 
-        serviceCollection.addScoped(
-            MongoDbGetSuggestionByIdQuery.name,
-            async (serviceProvider: ServiceProvider) => {
-                const mongoClient =
-                    (await serviceProvider.getService<MongoDbClient>('MongoDbClient')).getOrThrow();
+    serviceCollection.addScoped(MongoDbGetSuggestionByIdQuery.name, async (serviceProvider: ServiceProvider) => {
+      const mongoClient = (await serviceProvider.getService<MongoDbClient>("MongoDbClient")).getOrThrow();
 
-                return new MongoDbGetSuggestionByIdQuery(mongoClient);
-            },
-        );
+      return new MongoDbGetSuggestionByIdQuery(mongoClient);
+    });
 
-        /*
+    /*
         serviceCollection.addScoped(
             InMemoryFindAllTournamentsQuery.name,
             async (serviceProvider: ServiceProvider) => {
@@ -175,14 +125,14 @@ export class Persistence implements Module {
             },
         );
         */
-    }
+  }
 
-    use(_serviceProvider: ServiceProvider): Promise<void> {
-        console.log('Persistence module used');
-        return Promise.resolve();
-    }
+  use(_serviceProvider: ServiceProvider): Promise<void> {
+    console.log("Persistence module used");
+    return Promise.resolve();
+  }
 
-    static create(): Module {
-        return new Persistence();
-    }
+  static create(): Module {
+    return new Persistence();
+  }
 }

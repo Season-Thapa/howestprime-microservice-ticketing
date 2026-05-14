@@ -1,2 +1,4 @@
-export { SuggestionDocumentMapper } from './Mappers/SuggestionDocumentMapper.ts';
-export { MongoDbSuggestionRepository } from './MongoDbSuggestionRepository.ts';
+export { SuggestionDocumentMapper } from "./Mappers/SuggestionDocumentMapper.ts";
+export { MongoDbSuggestionRepository } from "./MongoDbSuggestionRepository.ts";
+export { MovieDocumentMapper } from "./Mappers/MovieDocumentMapper.ts";
+export { MongoDbMovieRepository } from "./MongoDbMovieRepository.ts";

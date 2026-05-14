@@ -20,13 +20,13 @@ export class PosterUrl  extends ValueObject {
 
     protected validate(): void {
         if (!this._value || this._value.trim().length === 0) {
-            throw new Error("Poster URL must not be empty.");
+            throw new InvalidPosterUrlException(this.value);
         }
 
         try {
             new URL(this._value);
         } catch {
-            throw new Error("Poster URL must be a valid URL.");
+            throw new InvalidPosterUrlException(this.value);
         }
     }
     get value(): string {

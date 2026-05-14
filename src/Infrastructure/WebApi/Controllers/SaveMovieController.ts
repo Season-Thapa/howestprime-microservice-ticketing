@@ -39,7 +39,7 @@ export class SaveMovieController implements WebApiController {
 
 
     }
-    private validateBody(body: any): boolean {
+    private validateBody(body: unknown): boolean {
         return (
             body !== null &&
             body !== undefined &&

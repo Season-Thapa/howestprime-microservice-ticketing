@@ -475,13 +475,3 @@ components:
           type: boolean
           example: true
           description: Whether customer agrees to terms and conditions
-
-    AddCustomerToOrderResponse:
-      type: object
-      required:
-        - message
-      properties:
-        message:
-          type: string
-          example: Customer added to order successfully
-          description: Success message

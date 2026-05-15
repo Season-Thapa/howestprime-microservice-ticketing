@@ -1,311 +1,396 @@
 openapi: 3.0.3
 info:
-    title: Suggestion Service Web API
-    version: 1.0.0
-    description: |
-        HTTP API for creating and querying suggestions.
+  title: Suggestion Service Web API
+  version: 1.0.0
+  description: |
+    HTTP API for creating and querying suggestions.
 
 servers:
-    - url: http://localhost:8000
-      description: Local development server
-
-tags:
-    - name: Suggestions
-      description: Create and read suggestions
-        - name: Movies
-            description: Save registered movies for ticketing
+  - url: http://localhost:8000
+    description: Local development server
 
 paths:
-    /api/suggestions:
-        get:
-            tags:
-                - Suggestions
-            summary: List suggestions
-            operationId: listSuggestions
-            responses:
-                '200':
-                    description: Suggestions retrieved
-                    content:
-                        application/json:
-                            schema:
-                                type: array
-                                items:
-                                    $ref: '#/components/schemas/SuggestionResponse'
-                            examples:
-                                suggestions:
-                                    value:
-                                        - id: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
-                                          email: jane.doe@example.com
-                                          title: Improve onboarding flow
-                                          description: Add contextual hints for first-time users.
-                                        - id: 7f6a0c4b-c0dd-4f6f-9ff5-7ef69ef9f6f4
-                                          email: john.smith@example.com
-                                          title: Add export feature
-                                          description: Allow exporting reports to CSV and PDF.
-                '500':
-                    $ref: '#/components/responses/InternalServerErrorProblem'
+  /api/suggestions:
+    get:
+      tags:
+        - Suggestions
+      summary: List suggestions
+      operationId: listSuggestions
+      responses:
+        "200":
+          description: Suggestions retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SuggestionResponse"
+              examples:
+                suggestions:
+                  value:
+                    - id: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                      email: jane.doe@example.com
+                      title: Improve onboarding flow
+                      description: Add contextual hints for first-time users.
+                    - id: 7f6a0c4b-c0dd-4f6f-9ff5-7ef69ef9f6f4
+                      email: john.smith@example.com
+                      title: Add export feature
+                      description: Allow exporting reports to CSV and PDF.
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
 
-        post:
-            tags:
-                - Suggestions
-            summary: Create suggestion
-            operationId: createSuggestion
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateSuggestionRequest'
-                        examples:
-                            createSuggestion:
-                                value:
-                                    email: user@example.com
-                                    title: Improve booking performance
-                                    description: Cache frequently requested movie data to reduce latency.
-            responses:
-                '201':
-                    description: Suggestion created
-                    headers:
-                        Location:
-                            $ref: '#/components/headers/Location'
-                '400':
-                    $ref: '#/components/responses/BadRequestProblem'
-                '500':
-                    $ref: '#/components/responses/InternalServerErrorProblem'
+    post:
+      tags:
+        - Suggestions
+      summary: Create suggestion
+      operationId: createSuggestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSuggestionRequest"
+            examples:
+              createSuggestion:
+                value:
+                  email: user@example.com
+                  title: Improve booking performance
+                  description: Cache frequently requested movie data to reduce latency.
+      responses:
+        "201":
+          description: Suggestion created
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
 
-    /api/suggestions/{suggestionId}:
-        get:
-            tags:
-                - Suggestions
-            summary: Get suggestion by id
-            operationId: getSuggestionById
-            parameters:
-                - $ref: '#/components/parameters/SuggestionId'
-            responses:
-                '200':
-                    description: Suggestion found
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SuggestionResponse'
-                            examples:
-                                suggestion:
-                                    value:
-                                        id: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
-                                        email: user@example.com
-                                        title: Improve booking performance
-                                        description: Cache frequently requested movie data to reduce latency.
-                '400':
-                    $ref: '#/components/responses/BadRequestProblem'
-                '404':
-                    $ref: '#/components/responses/NotFoundProblem'
-                '500':
-                    $ref: '#/components/responses/InternalServerErrorProblem'
+  /api/suggestions/{suggestionId}:
+    get:
+      tags:
+        - Suggestions
+      summary: Get suggestion by id
+      operationId: getSuggestionById
+      parameters:
+        - $ref: "#/components/parameters/SuggestionId"
+      responses:
+        "200":
+          description: Suggestion found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuggestionResponse"
+              examples:
+                suggestion:
+                  value:
+                    id: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                    email: user@example.com
+                    title: Improve booking performance
+                    description: Cache frequently requested movie data to reduce latency.
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "404":
+          $ref: "#/components/responses/NotFoundProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
 
-    /api/movies:
-        post:
-            tags:
-                - Movies
-            summary: Save registered movie snapshot
-            operationId: saveMovie
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/CreateMovieRequest'
-                        examples:
-                            saveMovie:
-                                value:
-                                    movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
-                                    title: The Great Booking
-                                    duration: 120
-                                    genres:
-                                        - Drama
-                                        - Thriller
-                                    ageRating: 12+
-                                    posterUrl: https://example.com/poster.jpg
-            responses:
-                '201':
-                    description: Movie snapshot saved
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/SaveMovieResponse'
-                            examples:
-                                created:
-                                    value:
-                                        movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
-                '400':
-                    $ref: '#/components/responses/BadRequestProblem'
-                '500':
-                    $ref: '#/components/responses/InternalServerErrorProblem'
+  /api/movies:
+    post:
+      tags:
+        - Movies
+      summary: Save registered movie snapshot
+      operationId: saveMovie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMovieRequest"
+            examples:
+              saveMovie:
+                value:
+                  movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                  title: The Great Booking
+                  duration: 120
+                  genres:
+                    - Drama
+                    - Thriller
+                  ageRating: 12+
+                  posterUrl: https://example.com/poster.jpg
+      responses:
+        "201":
+          description: Movie snapshot saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SaveMovieResponse"
+              examples:
+                created:
+                  value:
+                    movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
+
+  /api/orders/from-booking:
+    post:
+      tags:
+        - Orders
+      summary: Create order from booking
+      operationId: createOrderFromBooking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderFromBookingRequest"
+            examples:
+              createOrderFromBooking:
+                value:
+                  bookingId: 1d3c4f5a-1111-2222-3333-444455556666
+                  movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                  room: Room A
+                  showtime: "2026-05-15T18:30:00.000Z"
+                  standardVisitors: 2
+                  discountedVisitors: 1
+                  seatNumbers:
+                    - 12
+                    - 13
+                    - 14
+      responses:
+        "201":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateOrderFromBookingResponse"
+              examples:
+                created:
+                  value:
+                    orderId: 3b7f0ab1-0db6-4b7a-85d8-9c1a4f3f8b2c
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
 
 components:
-    parameters:
-        SuggestionId:
-            name: suggestionId
-            in: path
-            required: true
-            description: Suggestion identifier
-            schema:
-                $ref: '#/components/schemas/UUID'
+  parameters:
+    SuggestionId:
+      name: suggestionId
+      in: path
+      required: true
+      description: Suggestion identifier
+      schema:
+        $ref: "#/components/schemas/UUID"
 
-    headers:
-        Location:
-            description: URI of the created resource
-            schema:
-                type: string
-                format: uri-reference
-            example: /api/suggestions/8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+  headers:
+    Location:
+      description: URI of the created resource
+      schema:
+        type: string
+        format: uri-reference
+      example: /api/suggestions/8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
 
-    responses:
-        BadRequestProblem:
-            description: Validation or domain/application error
-            content:
-                application/problem+json:
-                    schema:
-                        $ref: '#/components/schemas/ProblemDetails'
-        NotFoundProblem:
-            description: Resource not found
-            content:
-                application/problem+json:
-                    schema:
-                        $ref: '#/components/schemas/ProblemDetails'
-        InternalServerErrorProblem:
-            description: Unhandled server error
-            content:
-                application/problem+json:
-                    schema:
-                        $ref: '#/components/schemas/ProblemDetails'
+  responses:
+    BadRequestProblem:
+      description: Validation or domain/application error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    NotFoundProblem:
+      description: Resource not found
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
+    InternalServerErrorProblem:
+      description: Unhandled server error
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
 
-    schemas:
-        CreateSuggestionRequest:
-            type: object
-            required:
-                - email
-                - title
-                - description
-            properties:
-                email:
-                    type: string
-                    format: email
-                    maxLength: 254
-                    example: user@example.com
-                title:
-                    type: string
-                    minLength: 3
-                    maxLength: 120
-                    example: Improve booking performance
-                description:
-                    type: string
-                    minLength: 10
-                    maxLength: 2000
-                    example: Cache frequently requested movie data to reduce latency.
+  schemas:
+    CreateSuggestionRequest:
+      type: object
+      required:
+        - email
+        - title
+        - description
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: user@example.com
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+          example: Improve booking performance
+        description:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          example: Cache frequently requested movie data to reduce latency.
 
-        SuggestionResponse:
-            type: object
-            required:
-                - id
-                - email
-                - title
-                - description
-            properties:
-                id:
-                    $ref: '#/components/schemas/UUID'
-                email:
-                    type: string
-                    format: email
-                    maxLength: 254
-                    example: user@example.com
-                title:
-                    type: string
-                    minLength: 3
-                    maxLength: 120
-                    example: Improve booking performance
-                description:
-                    type: string
-                    minLength: 10
-                    maxLength: 2000
-                    example: Cache frequently requested movie data to reduce latency.
+    SuggestionResponse:
+      type: object
+      required:
+        - id
+        - email
+        - title
+        - description
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: user@example.com
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+          example: Improve booking performance
+        description:
+          type: string
+          minLength: 10
+          maxLength: 2000
+          example: Cache frequently requested movie data to reduce latency.
 
-        ProblemDetails:
-            type: object
-            required:
-                - type
-                - title
-                - status
-                - detail
-                - instance
-            properties:
-                type:
-                    type: string
-                    format: uri
-                    example: https://tools.ietf.org/html/rfc7231#section-6.5.1
-                title:
-                    type: string
-                    example: Bad Request
-                status:
-                    type: integer
-                    format: int32
-                    minimum: 100
-                    maximum: 599
-                    example: 400
-                detail:
-                    type: string
-                    example: "SuggestionTitle has invalid value: ''."
-                instance:
-                    type: string
-                    format: uri
-                    example: http://localhost:8000/api/suggestions
+    ProblemDetails:
+      type: object
+      required:
+        - type
+        - title
+        - status
+        - detail
+        - instance
+      properties:
+        type:
+          type: string
+          format: uri
+          example: https://tools.ietf.org/html/rfc7231#section-6.5.1
+        title:
+          type: string
+          example: Bad Request
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 599
+          example: 400
+        detail:
+          type: string
+          example: "SuggestionTitle has invalid value: ''."
+        instance:
+          type: string
+          format: uri
+          example: http://localhost:8000/api/suggestions
 
-        UUID:
+    UUID:
+      type: string
+      format: uuid
+
+    CreateMovieRequest:
+      type: object
+      required:
+        - movieId
+        - title
+        - duration
+        - genres
+        - ageRating
+        - posterUrl
+      properties:
+        movieId:
+          $ref: "#/components/schemas/UUID"
+        title:
+          type: string
+          minLength: 1
+          example: The Great Booking
+        duration:
+          type: number
+          minimum: 1
+          example: 120
+        genres:
+          type: array
+          minItems: 1
+          items:
             type: string
-            format: uuid
+            minLength: 1
+          example:
+            - Drama
+            - Thriller
+        ageRating:
+          type: string
+          minLength: 1
+          example: 12+
+        posterUrl:
+          type: string
+          format: uri
+          minLength: 1
+          example: https://example.com/poster.jpg
 
-        CreateMovieRequest:
-            type: object
-            required:
-                - movieId
-                - title
-                - duration
-                - genres
-                - ageRating
-                - posterUrl
-            properties:
-                movieId:
-                    $ref: '#/components/schemas/UUID'
-                title:
-                    type: string
-                    minLength: 1
-                    example: The Great Booking
-                duration:
-                    type: number
-                    minimum: 1
-                    example: 120
-                genres:
-                    type: array
-                    minItems: 1
-                    items:
-                        type: string
-                        minLength: 1
-                    example:
-                        - Drama
-                        - Thriller
-                ageRating:
-                    type: string
-                    minLength: 1
-                    example: 12+
-                posterUrl:
-                    type: string
-                    format: uri
-                    minLength: 1
-                    example: https://example.com/poster.jpg
+    SaveMovieResponse:
+      type: object
+      required:
+        - movieId
+      properties:
+        movieId:
+          $ref: "#/components/schemas/UUID"
 
-        SaveMovieResponse:
-            type: object
-            required:
-                - movieId
-            properties:
-                movieId:
-                    $ref: '#/components/schemas/UUID'
+    CreateOrderFromBookingRequest:
+      type: object
+      required:
+        - bookingId
+        - movieId
+        - room
+        - showtime
+        - standardVisitors
+        - discountedVisitors
+        - seatNumbers
+      properties:
+        bookingId:
+          $ref: "#/components/schemas/UUID"
+        movieId:
+          $ref: "#/components/schemas/UUID"
+        room:
+          type: string
+          minLength: 1
+          example: Room A
+        showtime:
+          type: string
+          format: date-time
+          example: "2026-05-15T18:30:00.000Z"
+        standardVisitors:
+          type: integer
+          minimum: 0
+          example: 2
+        discountedVisitors:
+          type: integer
+          minimum: 0
+          example: 1
+        seatNumbers:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+            minimum: 1
+          example:
+            - 12
+            - 13
+            - 14
+
+    CreateOrderFromBookingResponse:
+      type: object
+      required:
+        - orderId
+      properties:
+        orderId:
+          $ref: "#/components/schemas/UUID"

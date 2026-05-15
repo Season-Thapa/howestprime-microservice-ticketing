@@ -11,7 +11,7 @@ export class BookingOpened extends BookingDomainEvent {
     private readonly _showtime: Date;
     private readonly _standardVisitors: number;
     private readonly _discountedVisitors: number;
-    private readonly _seatNumbers: string[];
+    private readonly _seatNumbers: number[];
     private readonly _occurredOn: Date;
 
     private constructor(
@@ -21,7 +21,7 @@ export class BookingOpened extends BookingDomainEvent {
         showtime: Date,
         standardVisitors: number,
         discountedVisitors: number,
-        seatNumbers: string[]
+        seatNumbers: number[]
     ) {
         super();
         this._bookingId = bookingId;
@@ -40,7 +40,7 @@ export class BookingOpened extends BookingDomainEvent {
         showtime: Date,
         standardVisitors: number,
         discountedVisitors: number,
-        seatNumbers: string[]
+        seatNumbers: number[]
     ): BookingOpened {
         return new BookingOpened(
             bookingId,
@@ -70,7 +70,7 @@ export class BookingOpened extends BookingDomainEvent {
     get discountedVisitors(): number {
         return this._discountedVisitors;
     }
-    get seatNumbers(): string[] {
+    get seatNumbers(): number[] {
         return this._seatNumbers;
     }
 

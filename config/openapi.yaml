@@ -238,21 +238,21 @@ paths:
                     agreeToTerms: false
                     customer: null
                     tickets:
-                      - ticketId: 5f6b1c2a-3c4d-5e6f-7a8b-9c0d1e2f3a4b
+                      - id: 5f6b1c2a-3c4d-5e6f-7a8b-9c0d1e2f3a4b
                         movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
                         room: Room A
                         seatNumber: 12
                         visitorType: standard
                         price: 15.0
                         showtime: "2026-05-15T18:30:00.000Z"
-                      - ticketId: 6g7c2d3b-4d5e-6f7g-8b9c-0d1e2f3g4b5c
+                      - id: 6g7c2d3b-4d5e-6f7g-8b9c-0d1e2f3g4b5c
                         movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
                         room: Room A
                         seatNumber: 13
                         visitorType: standard
                         price: 15.0
                         showtime: "2026-05-15T18:30:00.000Z"
-                      - ticketId: 7h8d3e4c-5e6f-7g8h-9c0d-1e2f3g4h5c6d
+                      - id: 7h8d3e4c-5e6f-7g8h-9c0d-1e2f3g4h5c6d
                         movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
                         room: Room A
                         seatNumber: 14
@@ -619,7 +619,7 @@ components:
     TicketData:
       type: object
       required:
-        - ticketId
+        - id
         - movieId
         - room
         - seatNumber
@@ -627,7 +627,7 @@ components:
         - price
         - showtime
       properties:
-        ticketId:
+        id:
           $ref: "#/components/schemas/UUID"
           description: Unique identifier of the ticket
         movieId:

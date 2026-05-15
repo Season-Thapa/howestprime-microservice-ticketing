@@ -1,9 +1,10 @@
 import { assertEquals, assertThrows } from "@std/assert";
-import { Order, BookingId, MovieInfo } from "@/Domain/Ticketing/Orders/mod.ts";
+import { BookingId, Customer, CustomerFirstName, CustomerLastName, CustomerSalutation, MovieInfo, Order } from "@/Domain/Ticketing/Orders/mod.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 import { Seat, VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
 import { MovieId, MovieTitle, AgeRating, Genre, MovieDuration, PosterUrl } from "@/Domain/Ticketing/Movies/mod.ts";
 import { Money } from "@/Domain/Shared/ValueObjects/Money.ts";
+import { Email } from "@/Domain/Shared/mod.ts";
 
 // Helper function to create valid movie info
 function createValidMovieInfo(): MovieInfo {
@@ -97,4 +98,115 @@ Deno.test("Order - generates UUID for id when created", () => {
 
   // Assert
   assertEquals(order1.id.value !== order2.id.value, true);
+});
+
+Deno.test("Order - accepts terms, sets customer, and progresses through paid lifecycle", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  const customer = Customer.create(
+    CustomerSalutation.Mr,
+    CustomerFirstName.create("John"),
+    CustomerLastName.create("Doe"),
+    Email.create("john.doe@example.com"),
+  );
+
+  order.acceptTerms();
+  order.setCustomer(customer);
+  order.markAsPaid();
+
+  assertEquals(order.agreeToTerms, true);
+  assertEquals(order.customer?.email.value, "john.doe@example.com");
+  assertEquals(order.status.value, "Paid");
+});
+
+Deno.test("Order - releases tickets after payment", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  order.acceptTerms();
+  order.markAsPaid();
+  order.releaseTickets();
+
+  assertEquals(order.status.value, "TicketReleased");
+});
+
+Deno.test("Order - cancels while open", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  order.cancel();
+
+  assertEquals(order.status.value, "Canceled");
+});
+
+Deno.test("Order - throws when setting customer before accepting terms", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+  const customer = Customer.create(
+    CustomerSalutation.Mr,
+    CustomerFirstName.create("John"),
+    CustomerLastName.create("Doe"),
+    Email.create("john.doe@example.com"),
+  );
+
+  assertThrows(() => order.setCustomer(customer), Error, "Customer can only be added after terms are accepted.");
+});
+
+Deno.test("Order - throws when marking as paid before accepting terms", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  assertThrows(() => order.markAsPaid(), Error, "Order can only be paid after terms are accepted.");
+});
+
+Deno.test("Order - throws when accepting terms after payment", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  order.acceptTerms();
+  order.markAsPaid();
+
+  assertThrows(() => order.acceptTerms(), Error, "Terms can only be accepted when the order is open.");
+});
+
+Deno.test("Order - throws when releasing tickets before payment", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  assertThrows(() => order.releaseTickets(), Error, "Tickets can only be released when the order is paid.");
+});
+
+Deno.test("Order - throws when canceling after payment", () => {
+  const bookingId = BookingId.create(crypto.randomUUID());
+  const movieInfo = createValidMovieInfo();
+  const seat = Seat.create(1, VisitorType.Standard);
+  const ticket = Ticket.create(movieInfo, seat, "Room A", new Date("2026-05-15T18:30:00Z"));
+  const order = Order.create(bookingId, [ticket]);
+
+  order.acceptTerms();
+  order.markAsPaid();
+
+  assertThrows(() => order.cancel(), Error, "Order can only be cancelled when it is open.");
 });

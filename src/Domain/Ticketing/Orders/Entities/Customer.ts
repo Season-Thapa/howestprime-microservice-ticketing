@@ -1,12 +1,11 @@
-import {Email, Entity, UUIDEntityId} from "@/Domain/Shared/mod.ts";
-import {CustomerFirstName} from "../ValueObjects/CustomerFirstName.ts";
-import {CustomerLastName} from "../ValueObjects/CustomerLastName.ts";
+import { Email, Entity, UUIDEntityId } from '@/Domain/Shared/mod.ts';
+import { CustomerFirstName } from '../ValueObjects/CustomerFirstName.ts';
+import { CustomerLastName } from '../ValueObjects/CustomerLastName.ts';
 
 export enum CustomerSalutation {
-    Mr = "Mr.",
-    Ms = "Ms.",
-    Mx = "Mx."
-
+    Mr = 'Mr.',
+    Ms = 'Ms.',
+    Mx = 'Mx.',
 }
 export class CustomerId extends UUIDEntityId {
     private constructor(id?: string) {
@@ -29,7 +28,7 @@ export class Customer extends Entity<CustomerId> {
         salutation: CustomerSalutation,
         firstName: CustomerFirstName,
         lastName: CustomerLastName,
-        email: Email
+        email: Email,
     ) {
         super(id);
         this._salutation = salutation;
@@ -42,14 +41,14 @@ export class Customer extends Entity<CustomerId> {
         salutation: CustomerSalutation,
         firstName: CustomerFirstName,
         lastName: CustomerLastName,
-        email: Email
+        email: Email,
     ): Customer {
         return new Customer(
             CustomerId.create(),
             salutation,
             firstName,
             lastName,
-            email
+            email,
         );
     }
 
@@ -68,6 +67,4 @@ export class Customer extends Entity<CustomerId> {
     get email(): Email {
         return this._email;
     }
-
-
 }

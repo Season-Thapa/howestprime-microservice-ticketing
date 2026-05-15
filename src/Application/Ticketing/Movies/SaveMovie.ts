@@ -1,17 +1,13 @@
-import type {
-    Logger,
-    UnitOfWork,
-    UseCase
-} from "@/Application/Ports/mod.ts";
+import type { Logger, UnitOfWork, UseCase } from '@/Application/Ports/mod.ts';
 import {
-    MovieId,
-    Movie,
-    MovieTitle,
-    MovieDuration,
     AgeRating,
+    Genre,
+    Movie,
+    MovieDuration,
+    MovieId,
+    MovieTitle,
     PosterUrl,
-    Genre
-} from "@/Domain/Ticketing/Movies/mod.ts";
+} from '@/Domain/Ticketing/Movies/mod.ts';
 
 export interface SaveMovieInput {
     movieId: string;
@@ -39,15 +35,13 @@ export class SaveMovie implements UseCase<SaveMovieInput, string> {
                 MovieId.create(input.movieId),
                 MovieTitle.create(input.title),
                 AgeRating.create(input.ageRating),
-                input.genres.map(genre => Genre.create(genre)),
+                input.genres.map((genre) => Genre.create(genre)),
                 MovieDuration.create(input.duration),
-                PosterUrl.create(input.posterUrl)
+                PosterUrl.create(input.posterUrl),
             );
             this._logger.info('Movie registered', { movie });
             await this._unitOfWork.save(movie);
             return movie.id.toString();
-
-
         });
         return result;
     }

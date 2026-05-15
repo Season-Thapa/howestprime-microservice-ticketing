@@ -1,4 +1,4 @@
-import {DomainException, ValueObject} from "@/Domain/Shared/mod.ts";
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 export class InvalidPaymentAmountException extends DomainException {
     constructor(value: number) {
         super(`Payment amount must be finite and greater than 0. invalid value: '${value}'`);

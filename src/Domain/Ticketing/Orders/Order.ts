@@ -1,9 +1,9 @@
-import { AggregateRoot, UUIDEntityId } from "@/Domain/Shared/mod.ts";
-import {OrderStatus, OrderStatusState} from "./ValueObjects/OrderStatus.ts";
-import { Money } from "../../Shared/ValueObjects/Money.ts";
-import {Customer} from "./Entities/Customer.ts";
-import { Ticket } from "./Entities/Ticket.ts";
-import {BookingId} from "./ValueObjects/BookingId.ts";
+import { AggregateRoot, UUIDEntityId } from '@/Domain/Shared/mod.ts';
+import { OrderStatus, OrderStatusState } from './ValueObjects/OrderStatus.ts';
+import { Money } from '../../Shared/ValueObjects/Money.ts';
+import { Customer } from './Entities/Customer.ts';
+import { Ticket } from './Entities/Ticket.ts';
+import { BookingId } from './ValueObjects/BookingId.ts';
 
 export class OrderId extends UUIDEntityId {
     private constructor(id?: string) {
@@ -30,7 +30,7 @@ export class Order extends AggregateRoot<OrderId> {
         price: Money,
         status: OrderStatus,
         agreeToTerms: boolean,
-        customer: Customer | null = null
+        customer: Customer | null = null,
     ) {
         super(id);
         this._bookingId = bookingId;
@@ -54,7 +54,7 @@ export class Order extends AggregateRoot<OrderId> {
             totalPrice,
             OrderStatus.create(OrderStatusState.Open),
             false,
-            null
+            null,
         );
         order.validate();
         return order;
@@ -86,47 +86,45 @@ export class Order extends AggregateRoot<OrderId> {
 
     public acceptTerms(): void {
         if (this._status.value !== OrderStatusState.Open) {
-            throw new Error("Terms can only be accepted when the order is open.");
+            throw new Error('Terms can only be accepted when the order is open.');
         }
         this._agreeToTerms = true;
     }
 
     public setCustomer(customer: Customer): void {
-        if(this._status.value !== OrderStatusState.Open){
-            throw new Error("Customer can only be set when the order is open.");
+        if (this._status.value !== OrderStatusState.Open) {
+            throw new Error('Customer can only be set when the order is open.');
         }
         if (!this._agreeToTerms) {
-            throw new Error("Customer can only be added after terms are accepted.");
+            throw new Error('Customer can only be added after terms are accepted.');
         }
-            this._customer = customer;
+        this._customer = customer;
     }
     public markAsPaid(): void {
         if (this._status.value !== OrderStatusState.Open) {
-            throw new Error("Order can only be marked as paid when it is open.");
+            throw new Error('Order can only be marked as paid when it is open.');
         }
         if (!this._agreeToTerms) {
-            throw new Error("Order can only be paid after terms are accepted.");
+            throw new Error('Order can only be paid after terms are accepted.');
         }
         this._status = OrderStatus.create(OrderStatusState.Paid);
     }
     public releaseTickets(): void {
         if (this._status.value !== OrderStatusState.Paid) {
-            throw new Error("Tickets can only be released when the order is paid.");
+            throw new Error('Tickets can only be released when the order is paid.');
         }
         this._status = OrderStatus.create(OrderStatusState.TicketReleased);
     }
     public cancel(): void {
         if (this._status.value !== OrderStatusState.Open) {
-            throw new Error("Order can only be cancelled when it is open.");
+            throw new Error('Order can only be cancelled when it is open.');
         }
         this._status = OrderStatus.create(OrderStatusState.Canceled);
     }
 
     protected validate(): void {
         if (!this._tickets || this._tickets.length === 0) {
-            throw new Error("An order must contain at least one ticket.");
+            throw new Error('An order must contain at least one ticket.');
         }
     }
-
-
 }

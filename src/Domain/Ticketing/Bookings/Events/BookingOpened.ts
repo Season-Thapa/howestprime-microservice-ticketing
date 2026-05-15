@@ -1,5 +1,5 @@
-import {EventFQDN} from "@/Domain/Shared/DomainEvents/EventFQDN.ts";
-import {BookingDomainEvent} from "./BookingDomainEvent.ts";
+import { EventFQDN } from '@/Domain/Shared/DomainEvents/EventFQDN.ts';
+import { BookingDomainEvent } from './BookingDomainEvent.ts';
 
 export class BookingOpened extends BookingDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
@@ -21,7 +21,7 @@ export class BookingOpened extends BookingDomainEvent {
         showtime: Date,
         standardVisitors: number,
         discountedVisitors: number,
-        seatNumbers: number[]
+        seatNumbers: number[],
     ) {
         super();
         this._bookingId = bookingId;
@@ -40,7 +40,7 @@ export class BookingOpened extends BookingDomainEvent {
         showtime: Date,
         standardVisitors: number,
         discountedVisitors: number,
-        seatNumbers: number[]
+        seatNumbers: number[],
     ): BookingOpened {
         return new BookingOpened(
             bookingId,
@@ -49,7 +49,7 @@ export class BookingOpened extends BookingDomainEvent {
             showtime,
             standardVisitors,
             discountedVisitors,
-            seatNumbers
+            seatNumbers,
         );
     }
     get bookingId(): string {
@@ -80,5 +80,4 @@ export class BookingOpened extends BookingDomainEvent {
     override get FQDN(): EventFQDN {
         return BookingOpened.FQDN;
     }
-
 }

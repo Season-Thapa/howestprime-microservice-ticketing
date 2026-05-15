@@ -1,11 +1,11 @@
-import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 
 export class InvalidCustomerLastNameException extends DomainException {
     constructor(value: string) {
         super(`CustomerLastName has invalid value: '${String(value)}'`);
     }
 }
-export class CustomerLastName  extends ValueObject {
+export class CustomerLastName extends ValueObject {
     private readonly _value: string;
     private constructor(value: string) {
         super();
@@ -22,7 +22,6 @@ export class CustomerLastName  extends ValueObject {
         if (!this._value || this._value.trim().length === 0) {
             throw new InvalidCustomerLastNameException(this._value);
         }
-
     }
     get value(): string {
         return this._value;

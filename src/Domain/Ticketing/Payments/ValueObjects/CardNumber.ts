@@ -1,7 +1,11 @@
-import {DomainException, ValueObject} from "@/Domain/Shared/mod.ts";
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 export class InvalidCardException extends DomainException {
     constructor(value: string) {
-        super(`Invalid card number format. Must be between 12 and 19 digits. Invalid value: '${String(value)}'`);
+        super(
+            `Invalid card number format. Must be between 12 and 19 digits. Invalid value: '${
+                String(value)
+            }'`,
+        );
     }
 }
 export class CardNumber extends ValueObject {
@@ -9,7 +13,7 @@ export class CardNumber extends ValueObject {
 
     private constructor(value: string) {
         super();
-        this._value = value.replace(/[\s-]/g, "");
+        this._value = value.replace(/[\s-]/g, '');
     }
 
     public static create(value: string): CardNumber {

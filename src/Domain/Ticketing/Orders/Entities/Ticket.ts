@@ -1,7 +1,7 @@
-import { Entity, UUIDEntityId } from "@/Domain/Shared/mod.ts";
-import { Money } from "../../../Shared/ValueObjects/Money.ts";
-import { MovieInfo } from "../ValueObjects/MovieInfo.ts";
-import {Seat, VisitorType} from "../ValueObjects/Seat.ts";
+import { Entity, UUIDEntityId } from '@/Domain/Shared/mod.ts';
+import { Money } from '../../../Shared/ValueObjects/Money.ts';
+import { MovieInfo } from '../ValueObjects/MovieInfo.ts';
+import { Seat, VisitorType } from '../ValueObjects/Seat.ts';
 export class TicketId extends UUIDEntityId {
     private constructor(id?: string) {
         super(id);
@@ -25,7 +25,7 @@ export class Ticket extends Entity<TicketId> {
         seat: Seat,
         room: string,
         price: Money,
-        showtime: Date
+        showtime: Date,
     ) {
         super(id);
         this._movieInfo = movieInfo;
@@ -39,7 +39,7 @@ export class Ticket extends Entity<TicketId> {
         movieInfo: MovieInfo,
         seat: Seat,
         room: string,
-        showtime: Date
+        showtime: Date,
     ): Ticket {
         const multiplier = seat.visitorType === VisitorType.Discounted ? 0.9 : 1.0;
         const ticketPrice = Money.create(movieInfo.price.amount * multiplier);
@@ -49,7 +49,7 @@ export class Ticket extends Entity<TicketId> {
             seat,
             room,
             ticketPrice,
-            showtime
+            showtime,
         );
         ticket.validate();
         return ticket;
@@ -76,8 +76,8 @@ export class Ticket extends Entity<TicketId> {
     }
 
     protected validate(): void {
-        if (!this._room || this._room.trim() === "") {
-            throw new Error("Room cannot be empty.");
+        if (!this._room || this._room.trim() === '') {
+            throw new Error('Room cannot be empty.');
         }
     }
 }

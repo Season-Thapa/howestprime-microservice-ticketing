@@ -1,4 +1,4 @@
-import { UUIDEntityId } from "@/Domain/Shared/mod.ts";
+import { UUIDEntityId } from '@/Domain/Shared/mod.ts';
 
 export class BookingId extends UUIDEntityId {
     private constructor(id: string) {

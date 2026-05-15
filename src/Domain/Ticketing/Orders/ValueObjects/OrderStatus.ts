@@ -1,4 +1,4 @@
-import { DomainException,ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 export class InvalidOrderStatusTransitionException extends DomainException {
     constructor(from: OrderStatus, to: OrderStatus, reason?: string) {
         const baseMessage = `Invalid order status transition from "${from}" to "${to}".`;
@@ -9,13 +9,12 @@ export class InvalidOrderStatusTransitionException extends DomainException {
     }
 }
 export enum OrderStatusState {
-    Open = "Open",
-    Paid = "Paid",
-    TicketReleased = "TicketReleased",
-    Canceled = "Canceled"
+    Open = 'Open',
+    Paid = 'Paid',
+    TicketReleased = 'TicketReleased',
+    Canceled = 'Canceled',
 }
 export class OrderStatus extends ValueObject {
-
     private readonly _value: OrderStatusState;
 
     private constructor(value: OrderStatusState) {
@@ -24,16 +23,15 @@ export class OrderStatus extends ValueObject {
     }
 
     public static create(value: OrderStatusState): OrderStatus {
-
-        const status =new OrderStatus(value);
+        const status = new OrderStatus(value);
         return status;
     }
-    static readonly Open =  OrderStatus.create(OrderStatusState.Open);
-    static readonly Paid =  OrderStatus.create(OrderStatusState.Paid);
-    static readonly TicketReleased =  OrderStatus.create(OrderStatusState.TicketReleased);
-    static readonly Canceled =  OrderStatus.create(OrderStatusState.Canceled);
-    transitionTo(targetStatus: OrderStatus) : OrderStatus {
-        if(!this.canTransitionTO(targetStatus)){
+    static readonly Open = OrderStatus.create(OrderStatusState.Open);
+    static readonly Paid = OrderStatus.create(OrderStatusState.Paid);
+    static readonly TicketReleased = OrderStatus.create(OrderStatusState.TicketReleased);
+    static readonly Canceled = OrderStatus.create(OrderStatusState.Canceled);
+    transitionTo(targetStatus: OrderStatus): OrderStatus {
+        if (!this.canTransitionTO(targetStatus)) {
             let reason: string = '';
 
             if (this.equals(targetStatus)) {
@@ -47,23 +45,21 @@ export class OrderStatus extends ValueObject {
     }
 
     private canTransitionTO(newStatus: OrderStatus): boolean {
-        const validTransition : Record<OrderStatusState, OrderStatusState[]> = {
-
+        const validTransition: Record<OrderStatusState, OrderStatusState[]> = {
             [OrderStatusState.Open]: [
                 OrderStatusState.Paid,
-                OrderStatusState.Canceled
+                OrderStatusState.Canceled,
             ],
             [OrderStatusState.Paid]: [
-                OrderStatusState.TicketReleased
-        ],
+                OrderStatusState.TicketReleased,
+            ],
             [OrderStatusState.TicketReleased]: [],
-            [OrderStatusState.Canceled]: []
-
+            [OrderStatusState.Canceled]: [],
         };
         return validTransition[this._value]?.includes(newStatus._value);
     }
     acceptTerms(): boolean {
-        if(this._value === OrderStatusState.Open) {
+        if (this._value === OrderStatusState.Open) {
             return true;
         }
         return false;
@@ -77,5 +73,4 @@ export class OrderStatus extends ValueObject {
         }
         return this._value === other._value;
     }
-
 }

@@ -1,5 +1,5 @@
-import {EventFQDN} from "@/Domain/Shared/DomainEvents/EventFQDN.ts";
-import {PaymentDomainEvent} from "./PaymentDomainEvent.ts";
+import { EventFQDN } from '@/Domain/Shared/DomainEvents/EventFQDN.ts';
+import { PaymentDomainEvent } from './PaymentDomainEvent.ts';
 
 export class PaymentSuccess extends PaymentDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
@@ -26,7 +26,6 @@ export class PaymentSuccess extends PaymentDomainEvent {
         paymentId: string,
         orderId: string,
         bookingId: string,
-
     ): PaymentSuccess {
         return new PaymentSuccess(
             paymentId,
@@ -49,5 +48,4 @@ export class PaymentSuccess extends PaymentDomainEvent {
     override get FQDN(): EventFQDN {
         return PaymentSuccess.FQDN;
     }
-
 }

@@ -1,10 +1,6 @@
-import {
-    type RouterContext,
-    type WebApiController
-} from '@/Infrastructure/WebApi/Shared/mod.ts';
+import { type RouterContext, type WebApiController } from '@/Infrastructure/WebApi/Shared/mod.ts';
 import { SaveMovieInput } from '@/Application/Ticketing/Movies/mod.ts';
-import type { Logger, UseCase }  from '@/Application/Ports/mod.ts'
-
+import type { Logger, UseCase } from '@/Application/Ports/mod.ts';
 
 export class SaveMovieController implements WebApiController {
     private readonly _useCase: UseCase<SaveMovieInput, string>;
@@ -19,25 +15,23 @@ export class SaveMovieController implements WebApiController {
             ctx.throw(400, 'Invalid input for movie registration');
         }
         this._logger.info('Received request to save movie', {
-        movieId: body.movieId,
-        title: body.title,
-        duration: body.duration,
-        ageRating: body.ageRating,
-        genres: body.genres,
-        posterUrl: body.posterUrl
-    });
-    const id: string = await this._useCase.execute({
-        movieId: body.movieId,
-        title: body.title,
-        duration: body.duration,
-        ageRating: body.ageRating,
-        genres: body.genres,
-        posterUrl: body.posterUrl
-    });
-    ctx.response.status = 201;
-    ctx.response.body = {movieId: id};
-
-
+            movieId: body.movieId,
+            title: body.title,
+            duration: body.duration,
+            ageRating: body.ageRating,
+            genres: body.genres,
+            posterUrl: body.posterUrl,
+        });
+        const id: string = await this._useCase.execute({
+            movieId: body.movieId,
+            title: body.title,
+            duration: body.duration,
+            ageRating: body.ageRating,
+            genres: body.genres,
+            posterUrl: body.posterUrl,
+        });
+        ctx.response.status = 201;
+        ctx.response.body = { movieId: id };
     }
     private validateBody(body: unknown): boolean {
         if (typeof body !== 'object' || body === null) {

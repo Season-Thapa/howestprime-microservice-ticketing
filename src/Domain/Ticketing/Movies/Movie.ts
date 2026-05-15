@@ -1,10 +1,10 @@
-import {AggregateRoot,UUIDEntityId} from "@/Domain/Shared/mod.ts";
-import {MovieTitle} from "./ValueObjects/MovieTitle.ts";
-import {AgeRating} from "./ValueObjects/AgeRating.ts";
-import {Genre, InvalidGenreException} from "./ValueObjects/Genre.ts";
-import {MovieDuration} from "./ValueObjects/MovieDuration.ts";
-import {PosterUrl} from "./ValueObjects/PosterUrl.ts";
-import {Money} from "../../Shared/ValueObjects/Money.ts";
+import { AggregateRoot, UUIDEntityId } from '@/Domain/Shared/mod.ts';
+import { MovieTitle } from './ValueObjects/MovieTitle.ts';
+import { AgeRating } from './ValueObjects/AgeRating.ts';
+import { Genre, InvalidGenreException } from './ValueObjects/Genre.ts';
+import { MovieDuration } from './ValueObjects/MovieDuration.ts';
+import { PosterUrl } from './ValueObjects/PosterUrl.ts';
+import { Money } from '../../Shared/ValueObjects/Money.ts';
 
 export class MovieId extends UUIDEntityId {
     private constructor(id: string) {
@@ -30,7 +30,7 @@ export class Movie extends AggregateRoot<MovieId> {
         genres: Genre[],
         movieDuration: MovieDuration,
         posterUrl: PosterUrl,
-        price: Money
+        price: Money,
     ) {
         super(id);
         this._title = title;
@@ -57,7 +57,7 @@ export class Movie extends AggregateRoot<MovieId> {
             genre,
             movieDuration,
             posterUrl,
-            calculatedPrice
+            calculatedPrice,
         );
         movie.validate();
 
@@ -88,7 +88,7 @@ export class Movie extends AggregateRoot<MovieId> {
     }
     protected validate(): void {
         if (this._genres.length === 0) {
-            throw new InvalidGenreException("At least one genre must be provided for movie.");
+            throw new InvalidGenreException('At least one genre must be provided for movie.');
         }
     }
 }

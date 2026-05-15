@@ -11,7 +11,7 @@ export class AddCustomerToOrderController implements WebApiController {
     }
     async handle(ctx: RouterContext<string>): Promise<void> {
         console.log('AddCustomerToOrderController handling request');
-        const orderId = ctx.params.id;
+        const orderId = ctx.params.orderId;
 
         if (!orderId) {
             ctx.response.status = 400;
@@ -50,11 +50,11 @@ export class AddCustomerToOrderController implements WebApiController {
 
         return (
             typeof payload.orderId === 'string' &&
+            typeof payload.customerSalutation === 'string' &&
             typeof payload.customerFirstName === 'string' &&
             typeof payload.customerLastName === 'string' &&
-            typeof payload.customerEmail === 'string' &&
-            typeof payload.customerSalutation === 'string' &&
-            typeof payload.AgreeToTerms === 'boolean'
+            typeof payload.email === 'string' &&
+            typeof payload.agreeToTerms === 'boolean'
         );
     }
 }

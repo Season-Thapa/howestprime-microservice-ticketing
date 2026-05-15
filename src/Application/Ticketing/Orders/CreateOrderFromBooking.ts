@@ -1,10 +1,9 @@
 import type { Logger, UnitOfWork, UseCase } from "@/Application/Ports/mod.ts";
 import type { MovieRepository } from "@/Domain/Ticketing/Movies/mod.ts";
 
-import { Order, BookingId, MovieInfo } from "../../../Domain/Ticketing/Orders/mod.ts";
-import { MovieId } from "@/Domain/Ticketing/Movies/ValueObjects/MovieId.ts";
-import { VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/VisitorType.ts";
-import { Seat } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
+import { Order, BookingId, MovieInfo } from "@/Domain/Ticketing/Orders/mod.ts";
+import { MovieId } from "@/Domain/Ticketing/Movies/mod.ts";
+import { Seat, VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 
 export interface CreateOrderFromBookingUseCaseInput {
@@ -33,13 +32,27 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
     const result = await this._unitOfWork.do<string>(async () => {
       const movieRepository = this._unitOfWork.getRepository<MovieRepository>("Movie");
       const movieId = MovieId.create(input.movieId);
-      const movie = await movieRepository.findById(movieId);
+      const movieOptional = await movieRepository.findById(movieId);
 
-      if (!movie) {
-        throw new Error(`Movie with ID ${input.movieId} not found. Ensure MovieRegistered event was processed.`);
+      if (!movieOptional.isPresent) {
+        throw new Error(
+            `Movie with ID ${input.movieId} not found. Ensure MovieRegistered event was processed.`,
+        );
       }
 
-      const movieInfo = MovieInfo.create(movie.id, movie.title, movie.duration, movie.genres, movie.posterUrl, movie.ageRating, movie.price);
+      const movie = movieOptional.getOrThrow(
+          `Movie with ID ${input.movieId} should be present.`,
+      );
+
+      const movieInfo = MovieInfo.create(
+          movie.id,
+          movie.title,
+          movie.duration,
+          movie.genres,
+          movie.posterUrl,
+          movie.ageRating,
+          movie.price,
+      );
       const tickets: Ticket[] = [];
       let remainingStandard = input.standardVisitors;
       const showtimeDate = new Date(input.showtime);

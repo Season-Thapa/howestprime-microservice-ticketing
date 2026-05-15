@@ -1,1 +1,1 @@
-export { CreateOrderFromBookingUseCaseInput, CreateOrderFromBookingUseCase } from './CreateOrderFromBookingUseCase.ts';
+export { type CreateOrderFromBookingUseCaseInput, CreateOrderFromBooking } from './CreateOrderFromBooking.ts';

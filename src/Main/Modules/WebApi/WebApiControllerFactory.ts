@@ -14,11 +14,13 @@ import {
   CreateSuggestionController,
   GetSuggestionByIdController,
   ListSuggestionsController,
+  CreateOrderFromBookingController,
   SaveMovieController,
 } from "@/Infrastructure/WebApi/Controllers/mod.ts";
 import { type ControllerFactory, type RouterContext, type WebApiController } from "@/Infrastructure/WebApi/Shared/mod.ts";
 import { IllegalStateException } from "@domaincrafters/std";
 import { ConsoleLogger } from "@/Infrastructure/Shared/mod.ts";
+import { CreateOrderFromBooking, type CreateOrderFromBookingUseCaseInput } from "@/Application/Ticketing/Orders/mod.ts";
 
 export class WebApiControllerFactory implements ControllerFactory {
   private readonly _serviceProvider: ServiceProvider;
@@ -41,6 +43,8 @@ export class WebApiControllerFactory implements ControllerFactory {
         return await this.createGetSuggestionByIdController();
       case SaveMovieController.name:
         return await this.createSaveMovieController();
+      case CreateOrderFromBookingController.name:
+        return await this.createCreateOrderFromBookingController();
 
       default:
         throw new IllegalStateException(`Controller for route ${ctx.routeName} is not defined`);
@@ -77,5 +81,15 @@ export class WebApiControllerFactory implements ControllerFactory {
     const logger = (await this._serviceProvider.getService<Logger>(ConsoleLogger.name)).getOrThrow();
 
     return new SaveMovieController(useCase, logger);
+  }
+
+  private async createCreateOrderFromBookingController(): Promise<CreateOrderFromBookingController> {
+    const useCase = (
+      await this._serviceProvider.getService<UseCase<CreateOrderFromBookingUseCaseInput, string>>(CreateOrderFromBooking.name)
+    ).getOrThrow();
+
+    const logger = (await this._serviceProvider.getService<Logger>(ConsoleLogger.name)).getOrThrow();
+
+    return new CreateOrderFromBookingController(useCase, logger);
   }
 }

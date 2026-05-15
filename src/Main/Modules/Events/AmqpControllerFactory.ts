@@ -8,11 +8,18 @@ import {
   type CreateSuggestionRequest,
   MovieRegisteredController,
   type MovieRegisteredRequest,
+    CreateOrderFromBookingController,
+    CreateOrderFromBookingRequest
 } from "@/Infrastructure/Messaging/LavinMQ/Controllers/mod.ts";
+
 
 import { type AmqpController, type ControllerFactory } from "@/Infrastructure/Messaging/LavinMQ/Shared/mod.ts";
 import type { ConsumerContext } from "@/Infrastructure/Messaging/LavinMQ/Shared/Amqp/AmqpBrokerConfigurator.ts";
 import { IllegalStateException } from "@domaincrafters/std";
+import {
+  CreateOrderFromBooking,
+  type CreateOrderFromBookingUseCaseInput,
+} from "@/Application/Ticketing/Orders/CreateOrderFromBooking.ts";
 
 export class AmqpControllerFactory implements ControllerFactory {
   private readonly _serviceProvider: ServiceProvider;
@@ -32,6 +39,10 @@ export class AmqpControllerFactory implements ControllerFactory {
         return this.createCreateSuggestionController();
       case "whenmovieregistered":
         return this.createMovieRegisteredController();
+      case "whenbookingopened":
+      case "whenordercreatedfrombooking":
+        return this.createCreateOrderFromBookingController();
+
     }
 
     const normalizedEventName = eventName.toLowerCase();
@@ -40,6 +51,8 @@ export class AmqpControllerFactory implements ControllerFactory {
         return this.createCreateSuggestionController();
       case "howestprime.movies.movie.movieregistered":
         return this.createMovieRegisteredController();
+      case "howestprime.movies.movieevent.bookingopened":
+        return this.createCreateOrderFromBookingController();
 
       default:
         throw new IllegalStateException(`No controller is defined for operation '${operationId}' and event '${eventName}'`);
@@ -58,5 +71,10 @@ export class AmqpControllerFactory implements ControllerFactory {
     const useCase = (await this._serviceProvider.getService<UseCase<SaveMovieInput, string>>(SaveMovie.name)).getOrThrow();
 
     return new MovieRegisteredController(useCase) as AmqpController<MovieRegisteredRequest>;
+  }
+  private async createCreateOrderFromBookingController(): Promise<AmqpController<unknown>> {
+    const useCase = (await this._serviceProvider.getService<UseCase<CreateOrderFromBookingUseCaseInput, string>>(CreateOrderFromBooking.name)).getOrThrow();
+
+    return new CreateOrderFromBookingController(useCase) as AmqpController<CreateOrderFromBookingRequest>;
   }
 }

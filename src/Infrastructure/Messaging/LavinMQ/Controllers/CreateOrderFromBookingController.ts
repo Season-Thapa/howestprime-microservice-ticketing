@@ -25,19 +25,16 @@ export class CreateOrderFromBookingController implements AmqpController<CreateOr
             throw new IllegalArgumentException('Suggestion create payload must be a JSON object.');
         }
         const payload = request as Record<string, unknown>;
-        if (Object.hasOwn(payload, 'payload')) {
-            throw new IllegalArgumentException(
-                "payload must be a JSON object.",
-            );
-        }
+        const body = Object.hasOwn(payload, "payload") ? (payload.payload as Record<string, unknown>) : payload;
+
         return {
             bookingId:this.requireNonEmptyString(body.bookingId, "bookingId"),
             movieId: this.requireNonEmptyString(body.movieId, "movieId"),
-            Room: this.requireNonEmptyString(body.room, "Room"),
-            Showtime: this.requireNonEmptyString(body.showtime, "Showtime"),
-            StandardVisitors: this.requireNumber(body.standardVisitors, "StandardVisitors"),
-            DiscountedVisitors: this.requireNumber(body.discountedVisitors, "DiscountedVisitors"),
-            SeatNumbers: this.requireNumberArray(body.seatNumbers, "SeatNumbers")
+            room: this.requireNonEmptyString(body.room, "Room"),
+            showtime: this.requireNonEmptyString(body.showtime, "Showtime"),
+            standardVisitors: this.requireNumber(body.standardVisitors, "StandardVisitors"),
+            discountedVisitors: this.requireNumber(body.discountedVisitors, "DiscountedVisitors"),
+            seatNumbers: this.requireNumberArray(body.seatNumbers, "SeatNumbers")
         }
     }
     private requireNonEmptyString(value: unknown, fieldName: string): string {

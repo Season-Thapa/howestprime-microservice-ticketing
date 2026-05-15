@@ -9,6 +9,7 @@ import {
   WhenSuggestionCreatedConsoleLogSuggestion,
 } from "@/Application/Ticketing/Suggestions/mod.ts";
 import { SaveMovie, type SaveMovieInput } from "@/Application/Ticketing/Movies/mod.ts";
+import { CreateOrderFromBooking, type CreateOrderFromBookingUseCaseInput } from "@/Application/Ticketing/Orders/mod.ts";
 import { domainEventPolicies } from "@/Application/mod.ts";
 import type { Logger, UseCase } from "@/Application/Ports/mod.ts";
 import type { SuggestionByIdReadModel, SuggestionListItemReadModel } from "@/Application/Ports/Queries/mod.ts";
@@ -46,6 +47,16 @@ export class Application implements Module {
       const logger = (await serviceProvider.getService<Logger>(ConsoleLogger.name)).getOrThrow();
 
       const useCase: UseCase<SaveMovieInput, string> = new SaveMovie(unitOfWork, logger);
+
+      return useCase;
+    });
+
+    serviceCollection.addScoped(CreateOrderFromBooking.name, async (serviceProvider: ServiceProvider) => {
+      const unitOfWork = (await serviceProvider.getService<MongoDbUnitOfWork>(MongoDbUnitOfWork.name)).getOrThrow();
+
+      const logger = (await serviceProvider.getService<Logger>(ConsoleLogger.name)).getOrThrow();
+
+      const useCase: UseCase<CreateOrderFromBookingUseCaseInput, string> = new CreateOrderFromBooking(unitOfWork, logger);
 
       return useCase;
     });

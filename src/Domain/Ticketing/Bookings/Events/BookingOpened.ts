@@ -11,7 +11,7 @@ export class BookingOpened extends BookingDomainEvent {
     private readonly _showtime: Date;
     private readonly _standardVisitors: number;
     private readonly _discountedVisitors: number;
-    private readonly _seatNumbers: string[];
+    private readonly _seatNumbers: number[];
     private readonly _occurredOn: Date;
 
     private constructor(

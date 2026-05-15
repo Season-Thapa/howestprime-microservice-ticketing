@@ -4,6 +4,7 @@ import {
     GetSuggestionByIdController,
     ListSuggestionsController,
     SaveMovieController,
+    AddCustomerToOrderController
 } from '@/Infrastructure/WebApi/Controllers/mod.ts';
 import { type Router, RouterBuilder, type Routes } from '@/Infrastructure/WebApi/Shared/mod.ts';
 
@@ -15,6 +16,7 @@ export class WebApiRoutes implements Routes {
             .mapGet(GetSuggestionByIdController.name, '/api/suggestions/:suggestionId')
             .mapPost(SaveMovieController.name, '/api/movies')
             .mapPost(CreateOrderFromBookingController.name, '/api/orders/from-booking')
+            .mapPost(AddCustomerToOrderController.name, '/api/orders/:orderId')
             .build();
     }
 }

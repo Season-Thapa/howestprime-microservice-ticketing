@@ -10,6 +10,7 @@ import {
 import { SaveMovie, type SaveMovieInput } from '@/Application/Ticketing/Movies/mod.ts';
 import type { Logger, UseCase } from '@/Application/Ports/mod.ts';
 import type {
+    OrderData,
     SuggestionByIdReadModel,
     SuggestionListItemReadModel,
 } from '@/Application/Ports/Queries/mod.ts';
@@ -17,6 +18,7 @@ import {
     AddCustomerToOrderController,
     CreateOrderFromBookingController,
     CreateSuggestionController,
+    GetOrderByBookingIdController,
     GetSuggestionByIdController,
     ListSuggestionsController,
     SaveMovieController,
@@ -33,6 +35,8 @@ import {
     type AddCustomerToOrderUseCaseInput,
     CreateOrderFromBooking,
     type CreateOrderFromBookingUseCaseInput,
+    GetOrderByBookingId,
+    type GetOrderByBookingIdInput,
 } from '@/Application/Ticketing/Orders/mod.ts';
 
 export class WebApiControllerFactory implements ControllerFactory {
@@ -60,6 +64,8 @@ export class WebApiControllerFactory implements ControllerFactory {
                 return await this.createCreateOrderFromBookingController();
             case AddCustomerToOrderController.name:
                 return await this.createAddCustomerToOrderController();
+            case GetOrderByBookingIdController.name:
+                return await this.createGetOrderByBookingIdController();
 
             default:
                 throw new IllegalStateException(
@@ -96,6 +102,15 @@ export class WebApiControllerFactory implements ControllerFactory {
         ).getOrThrow();
 
         return new GetSuggestionByIdController(useCase);
+    }
+    private async createGetOrderByBookingIdController(): Promise<GetOrderByBookingIdController> {
+        const useCase = (
+            await this._serviceProvider.getService<
+                UseCase<GetOrderByBookingIdInput, OrderData>
+            >(GetOrderByBookingId.name)
+        ).getOrThrow();
+
+        return new GetOrderByBookingIdController(useCase);
     }
 
     private async createSaveMovieController(): Promise<SaveMovieController> {

@@ -4,3 +4,4 @@ export { GetSuggestionByIdController } from './GetSuggestionByIdController.ts';
 export { SaveMovieController } from './SaveMovieController.ts';
 export { CreateOrderFromBookingController } from './CreateOrderFromBookingController.ts';
 export { AddCustomerToOrderController } from './AddCustomerToOrderController.ts';
+export { GetOrderByBookingIdController } from './GetOrderByBookingIdController.ts';

@@ -2,6 +2,7 @@ import {
     AddCustomerToOrderController,
     CreateOrderFromBookingController,
     CreateSuggestionController,
+    GetOrderByBookingIdController,
     GetSuggestionByIdController,
     ListSuggestionsController,
     SaveMovieController,
@@ -17,6 +18,7 @@ export class WebApiRoutes implements Routes {
             .mapPost(SaveMovieController.name, '/api/movies')
             .mapPost(CreateOrderFromBookingController.name, '/api/orders/from-booking')
             .mapPost(AddCustomerToOrderController.name, '/api/orders/:orderId/customer')
+            .mapGet(GetOrderByBookingIdController.name, '/api/orders/:bookingId')
             .build();
     }
 }

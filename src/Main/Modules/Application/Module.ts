@@ -8,22 +8,27 @@ import {
     ListSuggestionsQueryUseCase,
     WhenSuggestionCreatedConsoleLogSuggestion,
 } from '@/Application/Ticketing/Suggestions/mod.ts';
+
 import { SaveMovie, type SaveMovieInput } from '@/Application/Ticketing/Movies/mod.ts';
 import {
     AddCustomerToOrder,
     type AddCustomerToOrderUseCaseInput,
     CreateOrderFromBooking,
     type CreateOrderFromBookingUseCaseInput,
+    GetOrderByBookingId,
+    type GetOrderByBookingIdInput,
 } from '@/Application/Ticketing/Orders/mod.ts';
 import { domainEventPolicies } from '@/Application/mod.ts';
 import type { Logger, UseCase } from '@/Application/Ports/mod.ts';
 import type {
+    OrderData,
     SuggestionByIdReadModel,
     SuggestionListItemReadModel,
 } from '@/Application/Ports/Queries/mod.ts';
 import { DomainEventRegistry } from '@/Infrastructure/Events/Shared/mod.ts';
 import { PolicyDomainEventListener } from '@/Infrastructure/Events/mod.ts';
 import {
+    MongoDbGetOrderByBookingIdQuery,
     MongoDbGetSuggestionByIdQuery,
     MongoDbListSuggestionsQuery,
 } from '@/Infrastructure/Persistence/MongoDb/Queries/mod.ts';
@@ -140,6 +145,20 @@ export class Application implements Module {
                     GetSuggestionByIdQueryUseCaseInput,
                     SuggestionByIdReadModel
                 > = new GetSuggestionByIdQueryUseCase(query, logger);
+
+                return useCase;
+            },
+        );
+        serviceCollection.addScoped(
+            GetOrderByBookingId.name,
+            async (serviceProvider: ServiceProvider) => {
+                const query = (await serviceProvider.getService<MongoDbGetOrderByBookingIdQuery>(
+                    MongoDbGetOrderByBookingIdQuery.name,
+                )).getOrThrow();
+                const useCase: UseCase<
+                    GetOrderByBookingIdInput,
+                    OrderData
+                > = new GetOrderByBookingId(query);
 
                 return useCase;
             },

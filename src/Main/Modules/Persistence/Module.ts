@@ -20,6 +20,7 @@ import {
     SuggestionDocumentMapper,
 } from '@/Infrastructure/Persistence/MongoDb/Repositories/mod.ts';
 import {
+    MongoDbGetOrderByBookingIdQuery,
     MongoDbGetSuggestionByIdQuery,
     MongoDbListSuggestionsQuery,
 } from '@/Infrastructure/Persistence/MongoDb/Queries/mod.ts';
@@ -190,6 +191,15 @@ export class Persistence implements Module {
                     (await serviceProvider.getService<MongoDbClient>('MongoDbClient')).getOrThrow();
 
                 return new MongoDbGetSuggestionByIdQuery(mongoClient);
+            },
+        );
+        serviceCollection.addScoped(
+            MongoDbGetOrderByBookingIdQuery.name,
+            async (serviceProvider: ServiceProvider) => {
+                const mongoClient =
+                    (await serviceProvider.getService<MongoDbClient>('MongoDbClient')).getOrThrow();
+
+                return new MongoDbGetOrderByBookingIdQuery(mongoClient);
             },
         );
 

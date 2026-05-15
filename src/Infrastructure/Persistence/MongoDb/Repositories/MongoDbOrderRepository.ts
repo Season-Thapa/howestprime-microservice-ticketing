@@ -2,7 +2,7 @@ import {
     MongoDbClient,
     MongoDbRepository,
 } from '@/Infrastructure/Persistence/MongoDb/Shared/mod.ts';
-import { Order, OrderId } from '@/Domain/Ticketing/Orders/mod.ts';
+import { BookingId, Order, OrderId } from '@/Domain/Ticketing/Orders/mod.ts';
 import type { OrderRepository } from '@/Domain/Ticketing/Orders/mod.ts';
 import { OrderDocumentMapper } from './Mappers/OrderDocumentMapper.ts';
 import { Optional } from '@domaincrafters/std';
@@ -20,6 +20,20 @@ export class MongoDbOrderRepository extends MongoDbRepository<Order, OrderId>
     async findById(id: OrderId): Promise<Optional<Order>> {
         const filter = {
             _id: id.toString(),
+        } as unknown as Filter<Document>;
+        const document = await this._dbClient.findDocument(
+            filter,
+            MongoDbOrderRepository.collectionName,
+        );
+        if (!document.isPresent) {
+            return Optional.empty<Order>();
+        }
+
+        return document.map((doc) => this['_documentMapper'].reconstitute(doc));
+    }
+    async byBookingId(bookingId: BookingId): Promise<Optional<Order>> {
+        const filter = {
+            bookingId: bookingId,
         } as unknown as Filter<Document>;
         const document = await this._dbClient.findDocument(
             filter,

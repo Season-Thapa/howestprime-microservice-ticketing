@@ -176,13 +176,13 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerErrorProblem"
 
-  /api/orders/{orderId}:
+  /api/orders/{orderId}/customer:
     post:
       tags:
         - Orders
       summary: Add customer to order
       operationId: addCustomerToOrder
-      description: Associates customer information and terms acceptance with an order
+      description: Associates customer information and terms acceptance with an existing order
       parameters:
         - $ref: "#/components/parameters/OrderId"
       requestBody:
@@ -200,16 +200,11 @@ paths:
                   email: john.doe@example.com
                   agreeToTerms: true
       responses:
-        "200":
+        "201":
           description: Customer added to order successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AddCustomerToOrderResponse"
-              examples:
-                success:
-                  value:
-                    message: Customer added to order successfully
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
         "400":
           $ref: "#/components/responses/BadRequestProblem"
         "404":

@@ -12,6 +12,7 @@ export class ListSuggestionsController implements WebApiController {
     ) {}
 
     async handle(ctx: RouterContext<string>): Promise<void> {
+        console.log('ListSuggestionsController handling request controlling request');
         const suggestions = await this._listSuggestionsUseCase.execute(undefined);
         WebApiResult.ok(ctx, suggestions);
     }

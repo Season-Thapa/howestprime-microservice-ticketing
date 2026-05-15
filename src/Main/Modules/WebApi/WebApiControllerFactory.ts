@@ -14,6 +14,7 @@ import type {
     SuggestionListItemReadModel,
 } from '@/Application/Ports/Queries/mod.ts';
 import {
+    AddCustomerToOrderController,
     CreateOrderFromBookingController,
     CreateSuggestionController,
     GetSuggestionByIdController,
@@ -28,6 +29,8 @@ import {
 import { IllegalStateException } from '@domaincrafters/std';
 import { ConsoleLogger } from '@/Infrastructure/Shared/mod.ts';
 import {
+    AddCustomerToOrder,
+    type AddCustomerToOrderUseCaseInput,
     CreateOrderFromBooking,
     type CreateOrderFromBookingUseCaseInput,
 } from '@/Application/Ticketing/Orders/mod.ts';
@@ -55,6 +58,8 @@ export class WebApiControllerFactory implements ControllerFactory {
                 return await this.createSaveMovieController();
             case CreateOrderFromBookingController.name:
                 return await this.createCreateOrderFromBookingController();
+            case AddCustomerToOrderController.name:
+                return await this.createAddCustomerToOrderController();
 
             default:
                 throw new IllegalStateException(
@@ -117,5 +122,18 @@ export class WebApiControllerFactory implements ControllerFactory {
             .getOrThrow();
 
         return new CreateOrderFromBookingController(useCase, logger);
+    }
+
+    private async createAddCustomerToOrderController(): Promise<AddCustomerToOrderController> {
+        const useCase = (
+            await this._serviceProvider.getService<
+                UseCase<AddCustomerToOrderUseCaseInput, string>
+            >(AddCustomerToOrder.name)
+        ).getOrThrow();
+
+        const logger = (await this._serviceProvider.getService<Logger>(ConsoleLogger.name))
+            .getOrThrow();
+
+        return new AddCustomerToOrderController(useCase, logger);
     }
 }

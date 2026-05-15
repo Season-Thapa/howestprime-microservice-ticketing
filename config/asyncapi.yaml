@@ -80,6 +80,20 @@ channels:
           type: topic
           routingKey: howestprime.movies.movieevent.bookingopened
 
+  howestprime.ticketing.orders.addcustomertoorder:
+    address: howestprime.ticketing.orders.addcustomertoorder
+    title: Add customer to order
+    messages:
+      AddCustomerToOrder:
+        $ref: "#/components/messages/AddCustomerToOrder"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: howestprime.ticketing.orders.addcustomertoorder
+
 operations:
   WhenSuggestionSendCreateSuggestion:
     action: receive
@@ -121,6 +135,16 @@ operations:
     messages:
       - $ref: "#/channels/howestprime.movies.movieevent.bookingopened/messages/BookingOpened"
 
+  WhenAddCustomerToOrder:
+    action: receive
+    channel:
+      $ref: "#/channels/howestprime.ticketing.orders.addcustomertoorder"
+    description: |
+      Triggered when a customer needs to be added to an existing order.
+      Consumes the message and delegates to the AddCustomerToOrder use case.
+    messages:
+      - $ref: "#/channels/howestprime.ticketing.orders.addcustomertoorder/messages/AddCustomerToOrder"
+
 components:
   messages:
     SuggestionSendCreateSuggestion:
@@ -150,6 +174,13 @@ components:
       summary: Event message emitted when a booking is opened in the Movies microservice.
       payload:
         $ref: "#/components/schemas/BookingOpenedPayload"
+
+    AddCustomerToOrder:
+      name: AddCustomerToOrder
+      title: Add customer to order
+      summary: Command message to add customer information and terms acceptance to an order.
+      payload:
+        $ref: "#/components/schemas/AddCustomerToOrderPayload"
 
   schemas:
     SuggestionSendCreateSuggestionPayload:
@@ -304,3 +335,47 @@ components:
             - 12
             - 13
             - 14
+
+    AddCustomerToOrderPayload:
+      type: object
+      required:
+        - orderId
+        - customerSalutation
+        - customerFirstName
+        - customerLastName
+        - email
+        - agreeToTerms
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: Identifier of the order to add customer to.
+          example: 5ec4499c-fd90-4255-aa6a-c744b24302d6
+        customerSalutation:
+          type: string
+          enum:
+            - Mr.
+            - Ms.
+            - Mx.
+          description: Customer salutation title.
+          example: Mr.
+        customerFirstName:
+          type: string
+          minLength: 1
+          description: Customer first name.
+          example: John
+        customerLastName:
+          type: string
+          minLength: 1
+          description: Customer last name.
+          example: Doe
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: Customer email address.
+          example: john.doe@example.com
+        agreeToTerms:
+          type: boolean
+          description: Whether customer agrees to terms and conditions.
+          example: true

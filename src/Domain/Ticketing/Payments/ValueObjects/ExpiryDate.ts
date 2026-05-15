@@ -1,4 +1,4 @@
-import {DomainException, ValueObject} from "@/Domain/Shared/mod.ts";
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 export class InvalidExpiryDataException extends DomainException {
     constructor(value: string) {
         super(`Invalid expiry date format. Must be MM/YY. '${String(value)}'`);

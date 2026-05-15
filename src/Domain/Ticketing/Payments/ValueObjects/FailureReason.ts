@@ -1,4 +1,4 @@
-import { ValueObject } from "@/Domain/Shared/mod.ts";
+import { ValueObject } from '@/Domain/Shared/mod.ts';
 
 export class FailureReason extends ValueObject {
     private readonly _value: string;
@@ -19,8 +19,8 @@ export class FailureReason extends ValueObject {
     }
 
     protected validate(): void {
-        if (!this._value || this._value === "") {
-            throw new Error("Failure reason must not be empty.");
+        if (!this._value || this._value === '') {
+            throw new Error('Failure reason must not be empty.');
         }
     }
 

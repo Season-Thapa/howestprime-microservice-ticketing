@@ -1,4 +1,4 @@
-import { ValueObject } from "@/Domain/Shared/mod.ts";
+import { ValueObject } from '@/Domain/Shared/mod.ts';
 
 export class ExternalId extends ValueObject {
     private readonly _value: string;
@@ -20,8 +20,8 @@ export class ExternalId extends ValueObject {
 
     protected validate(): void {
         const trimmedValue = this._value?.trim();
-        if (!trimmedValue || trimmedValue === "") {
-            throw new Error("External Id must not be empty after trimming.");
+        if (!trimmedValue || trimmedValue === '') {
+            throw new Error('External Id must not be empty after trimming.');
         }
     }
 

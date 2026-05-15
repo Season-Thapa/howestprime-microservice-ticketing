@@ -1,11 +1,11 @@
-import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 
 export class InvalidPosterUrlException extends DomainException {
     constructor(value: string) {
         super(`PosterUrl has invalid value: '${String(value)}'`);
     }
 }
-export class PosterUrl  extends ValueObject {
+export class PosterUrl extends ValueObject {
     private readonly _value: string;
     private constructor(value: string) {
         super();

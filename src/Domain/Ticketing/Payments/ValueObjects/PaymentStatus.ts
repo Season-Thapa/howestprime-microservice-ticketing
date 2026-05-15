@@ -1,6 +1,6 @@
-import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 export class InvalidPaymentStatusTransitionException extends DomainException {
-    constructor(from: PaymentStatus, to: PaymentStatus, reason?: string)  {
+    constructor(from: PaymentStatus, to: PaymentStatus, reason?: string) {
         const baseMessage = `Invalid payment status transition from "${from}" to "${to}".`;
         const fullMessage = reason
             ? `${baseMessage} ${reason}`
@@ -9,13 +9,11 @@ export class InvalidPaymentStatusTransitionException extends DomainException {
     }
 }
 export enum PaymentStatusState {
-    Pending = "Pending",
-    Success = "Success",
-    Failed = "Failed",
-
+    Pending = 'Pending',
+    Success = 'Success',
+    Failed = 'Failed',
 }
 export class PaymentStatus extends ValueObject {
-
     private readonly _value: PaymentStatusState;
 
     private constructor(value: PaymentStatusState) {
@@ -27,14 +25,14 @@ export class PaymentStatus extends ValueObject {
         const status = new PaymentStatus(value);
         return status;
     }
-    static readonly Pending =  PaymentStatus.create(PaymentStatusState.Pending);
-    static readonly Success =  PaymentStatus.create(PaymentStatusState.Success);
-    static readonly Failed =  PaymentStatus.create(PaymentStatusState.Failed);
+    static readonly Pending = PaymentStatus.create(PaymentStatusState.Pending);
+    static readonly Success = PaymentStatus.create(PaymentStatusState.Success);
+    static readonly Failed = PaymentStatus.create(PaymentStatusState.Failed);
     transitionTo(targetStatus: PaymentStatus): PaymentStatus {
         if (!this.canTransitionTo(targetStatus)) {
             let reason: string = '';
 
-             if (this.equals(targetStatus)) {
+            if (this.equals(targetStatus)) {
                 reason = 'The payment is already in this status.';
             } else {
                 reason = 'This transition violates payment  rules.';
@@ -45,20 +43,16 @@ export class PaymentStatus extends ValueObject {
 
         return targetStatus;
     }
-    private canTransitionTo(newStatus: PaymentStatus): boolean{
-
-            const validTransitions : Record<PaymentStatusState, PaymentStatusState[]> = {
-                [PaymentStatusState.Pending]: [
-                    PaymentStatusState.Success,
-                    PaymentStatusState.Failed,
-                ],
-                [PaymentStatusState.Failed]: [],
-                [PaymentStatusState.Success]: []
-
-            };
-            return validTransitions[this._value].includes(newStatus._value);
-
-
+    private canTransitionTo(newStatus: PaymentStatus): boolean {
+        const validTransitions: Record<PaymentStatusState, PaymentStatusState[]> = {
+            [PaymentStatusState.Pending]: [
+                PaymentStatusState.Success,
+                PaymentStatusState.Failed,
+            ],
+            [PaymentStatusState.Failed]: [],
+            [PaymentStatusState.Success]: [],
+        };
+        return validTransitions[this._value].includes(newStatus._value);
     }
     get value(): string {
         return this._value;

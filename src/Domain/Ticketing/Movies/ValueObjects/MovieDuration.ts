@@ -1,4 +1,4 @@
-import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 const MIN_Duration_LENGTH = 1;
 
 export class InvalidMovieDurationException extends DomainException {
@@ -6,7 +6,7 @@ export class InvalidMovieDurationException extends DomainException {
         super(`Duration has invalid value: '${value}'`);
     }
 }
-export class MovieDuration  extends ValueObject {
+export class MovieDuration extends ValueObject {
     private readonly _value: number;
     private constructor(value: number) {
         super();
@@ -23,7 +23,6 @@ export class MovieDuration  extends ValueObject {
         if (this._value < MIN_Duration_LENGTH) {
             throw new InvalidMovieDurationException(this._value);
         }
-
     }
 
     get duration(): number {

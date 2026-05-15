@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import { OrderStatus, OrderStatusState } from "@/Domain/Ticketing/Orders/ValueObjects/OrderStatus.ts";
 
 Deno.test("OrderStatus - creates successfully with 'Open' status", () => {

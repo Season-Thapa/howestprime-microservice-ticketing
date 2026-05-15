@@ -1,16 +1,20 @@
-import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 
 export class InvalidPaymentMethodException extends DomainException {
     constructor(value: string) {
-        super(`PaymentMethod must be either credit card or bank transfer. invalid value: '${String(value)}'`);
+        super(
+            `PaymentMethod must be either credit card or bank transfer. invalid value: '${
+                String(value)
+            }'`,
+        );
     }
 }
 export enum PaymentMethodType {
     CreditCard = 'Credit Card',
-    BankTransfer = 'Bank Transfer'
+    BankTransfer = 'Bank Transfer',
 }
 
-export class PaymentMethod  extends ValueObject {
+export class PaymentMethod extends ValueObject {
     private readonly _value: PaymentMethodType;
     private constructor(value: PaymentMethodType) {
         super();
@@ -28,7 +32,6 @@ export class PaymentMethod  extends ValueObject {
         if (!validValues.includes(this._value)) {
             throw new InvalidPaymentMethodException(String(this._value));
         }
-
     }
     get value(): string {
         return this._value;

@@ -1,5 +1,5 @@
-import {EventFQDN} from "@/Domain/Shared/DomainEvents/EventFQDN.ts";
-import {OrderDomainEvent} from "./OrderDomainEvent.ts";
+import { EventFQDN } from '@/Domain/Shared/DomainEvents/EventFQDN.ts';
+import { OrderDomainEvent } from './OrderDomainEvent.ts';
 
 export class TicketReleased extends OrderDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
@@ -24,8 +24,6 @@ export class TicketReleased extends OrderDomainEvent {
         showtime: Date;
     }[];
 
-
-
     private readonly _occurredOn: Date;
 
     private constructor(
@@ -44,7 +42,7 @@ export class TicketReleased extends OrderDomainEvent {
             visitorType: string;
             price: number;
             showtime: Date;
-        }[]
+        }[],
     ) {
         super();
         this._orderId = orderId;
@@ -68,22 +66,32 @@ export class TicketReleased extends OrderDomainEvent {
             visitorType: string;
             price: number;
             showtime: Date;
-        }[]
+        }[],
     ): TicketReleased {
         return new TicketReleased(
             orderId,
             customer,
-            tickets
+            tickets,
         );
     }
     get orderId(): string {
         return this._orderId;
     }
-    get customer(): { salutation: string; firstname: string; lastname: string; email: string; } | null {
+    get customer():
+        | { salutation: string; firstname: string; lastname: string; email: string }
+        | null {
         return this._customer;
     }
 
-    get tickets(): { ticketId: string; movieId: string; room: string; seatNumber: number; visitorType: string; price: number; showtime: Date; }[] {
+    get tickets(): {
+        ticketId: string;
+        movieId: string;
+        room: string;
+        seatNumber: number;
+        visitorType: string;
+        price: number;
+        showtime: Date;
+    }[] {
         return this._tickets;
     }
 
@@ -93,5 +101,4 @@ export class TicketReleased extends OrderDomainEvent {
     override get FQDN(): EventFQDN {
         return TicketReleased.FQDN;
     }
-
 }

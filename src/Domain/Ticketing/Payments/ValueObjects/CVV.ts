@@ -1,4 +1,4 @@
-import {DomainException, ValueObject} from "@/Domain/Shared/mod.ts";
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 export class InvalidCVVException extends DomainException {
     constructor(value: string) {
         super(`Invalid CVV format. Must be 3 or 4 digits. '${String(value)}'`);

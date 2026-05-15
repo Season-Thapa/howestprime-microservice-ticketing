@@ -1,1 +1,1 @@
-export { SaveMovie, type SaveMovieInput} from './SaveMovie.ts'
+export { SaveMovie, type SaveMovieInput } from './SaveMovie.ts';

@@ -1,11 +1,11 @@
-import {DomainException, ValueObject} from '@/Domain/Shared/mod.ts';
+import { DomainException, ValueObject } from '@/Domain/Shared/mod.ts';
 
 export class InvalidGenreException extends DomainException {
     constructor(value: string) {
         super(`Genre has invalid value: '${String(value)}'`);
     }
 }
-export class Genre  extends ValueObject {
+export class Genre extends ValueObject {
     private readonly _value: string;
     private constructor(value: string) {
         super();
@@ -22,7 +22,6 @@ export class Genre  extends ValueObject {
         if (!this._value || this._value.trim().length === 0) {
             throw new InvalidGenreException(this._value);
         }
-
     }
     get value(): string {
         return this._value;

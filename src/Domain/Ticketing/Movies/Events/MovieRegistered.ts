@@ -1,5 +1,5 @@
-import {EventFQDN} from "@/Domain/Shared/DomainEvents/EventFQDN.ts";
-import {MovieDomainEvent} from "./MovieDomainEvent.ts";
+import { EventFQDN } from '@/Domain/Shared/DomainEvents/EventFQDN.ts';
+import { MovieDomainEvent } from './MovieDomainEvent.ts';
 
 export class MovieRegistered extends MovieDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
@@ -96,5 +96,4 @@ export class MovieRegistered extends MovieDomainEvent {
     override get FQDN(): EventFQDN {
         return MovieRegistered.FQDN;
     }
-
 }

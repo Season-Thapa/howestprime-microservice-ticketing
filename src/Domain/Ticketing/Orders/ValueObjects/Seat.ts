@@ -1,8 +1,8 @@
-import { ValueObject } from "@/Domain/Shared/mod.ts";
+import { ValueObject } from '@/Domain/Shared/mod.ts';
 
 export enum VisitorType {
-    Standard = "standard",
-    Discounted = "discounted"
+    Standard = 'standard',
+    Discounted = 'discounted',
 }
 
 export class Seat extends ValueObject {
@@ -43,8 +43,7 @@ export class Seat extends ValueObject {
     }
     protected validate(): void {
         if (this._seatNumber <= 0 || !Number.isInteger(this._seatNumber)) {
-            throw new Error("Seat number must be a valid positive integer.");
+            throw new Error('Seat number must be a valid positive integer.');
         }
-
     }
 }

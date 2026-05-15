@@ -1,14 +1,13 @@
-import { ValueObject } from "@/Domain/Shared/mod.ts";
-import { MovieId } from "../../Movies/Movie.ts";
-import { MovieTitle } from "../../Movies/ValueObjects/MovieTitle.ts";
-import { MovieDuration } from "../../Movies/ValueObjects/MovieDuration.ts";
-import { Genre } from "../../Movies/ValueObjects/Genre.ts";
-import { PosterUrl } from "../../Movies/ValueObjects/PosterUrl.ts";
-import { AgeRating } from "../../Movies/ValueObjects/AgeRating.ts";
-import { Money } from "../../../Shared/ValueObjects/Money.ts";
+import { ValueObject } from '@/Domain/Shared/mod.ts';
+import { MovieId } from '../../Movies/Movie.ts';
+import { MovieTitle } from '../../Movies/ValueObjects/MovieTitle.ts';
+import { MovieDuration } from '../../Movies/ValueObjects/MovieDuration.ts';
+import { Genre } from '../../Movies/ValueObjects/Genre.ts';
+import { PosterUrl } from '../../Movies/ValueObjects/PosterUrl.ts';
+import { AgeRating } from '../../Movies/ValueObjects/AgeRating.ts';
+import { Money } from '../../../Shared/ValueObjects/Money.ts';
 
 export class MovieInfo extends ValueObject {
-
     private readonly _id: MovieId;
     private readonly _title: MovieTitle;
     private readonly _duration: MovieDuration;
@@ -24,7 +23,7 @@ export class MovieInfo extends ValueObject {
         genres: Genre[],
         posterUrl: PosterUrl,
         ageRating: AgeRating,
-        price: Money
+        price: Money,
     ) {
         super();
         this._id = id;
@@ -43,7 +42,7 @@ export class MovieInfo extends ValueObject {
         genres: Genre[],
         posterUrl: PosterUrl,
         ageRating: AgeRating,
-        price: Money
+        price: Money,
     ): MovieInfo {
         return new MovieInfo(id, title, duration, genres, posterUrl, ageRating, price);
     }
@@ -96,5 +95,4 @@ export class MovieInfo extends ValueObject {
             areGenresEqual
         );
     }
-
 }

@@ -1,5 +1,5 @@
-import {EventFQDN} from "@/Domain/Shared/DomainEvents/EventFQDN.ts";
-import {OrderDomainEvent} from "./OrderDomainEvent.ts";
+import { EventFQDN } from '@/Domain/Shared/DomainEvents/EventFQDN.ts';
+import { OrderDomainEvent } from './OrderDomainEvent.ts';
 
 export class OrderPaid extends OrderDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
@@ -8,14 +8,11 @@ export class OrderPaid extends OrderDomainEvent {
     private readonly _orderId: string;
     private readonly _bookingId: string;
 
-
-
     private readonly _occurredOn: Date;
 
     private constructor(
         orderId: string,
         bookingId: string,
-    
     ) {
         super();
         this._orderId = orderId;
@@ -24,13 +21,11 @@ export class OrderPaid extends OrderDomainEvent {
     }
     static create(
         orderId: string,
-        bookingId: string
-
-
+        bookingId: string,
     ): OrderPaid {
         return new OrderPaid(
             orderId,
-            bookingId
+            bookingId,
         );
     }
 
@@ -47,5 +42,4 @@ export class OrderPaid extends OrderDomainEvent {
     override get FQDN(): EventFQDN {
         return OrderPaid.FQDN;
     }
-
 }

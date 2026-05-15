@@ -5,7 +5,7 @@ import {
 import { Order, OrderId } from '@/Domain/Ticketing/Orders/mod.ts';
 import type { OrderRepository } from '@/Domain/Ticketing/Orders/mod.ts';
 import { OrderDocumentMapper } from './Mappers/OrderDocumentMapper.ts';
-import { Optional } from 'https://jsr.io/@domaincrafters/std/1.1.0/src/Optional.ts';
+import { Optional } from '@domaincrafters/std';
 import type { Document, Filter } from '@mongodb';
 export class MongoDbOrderRepository extends MongoDbRepository<Order, OrderId>
     implements OrderRepository {

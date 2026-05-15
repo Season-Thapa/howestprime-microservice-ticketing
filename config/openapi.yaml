@@ -176,6 +176,47 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerErrorProblem"
 
+  /api/orders/{orderId}:
+    post:
+      tags:
+        - Orders
+      summary: Add customer to order
+      operationId: addCustomerToOrder
+      description: Associates customer information and terms acceptance with an order
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCustomerToOrderRequest"
+            examples:
+              addCustomer:
+                value:
+                  customerSalutation: Mr.
+                  customerFirstName: John
+                  customerLastName: Doe
+                  email: john.doe@example.com
+                  agreeToTerms: true
+      responses:
+        "200":
+          description: Customer added to order successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddCustomerToOrderResponse"
+              examples:
+                success:
+                  value:
+                    message: Customer added to order successfully
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "404":
+          $ref: "#/components/responses/NotFoundProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
+
 components:
   parameters:
     SuggestionId:
@@ -183,6 +224,13 @@ components:
       in: path
       required: true
       description: Suggestion identifier
+      schema:
+        $ref: "#/components/schemas/UUID"
+    OrderId:
+      name: orderId
+      in: path
+      required: true
+      description: Order identifier
       schema:
         $ref: "#/components/schemas/UUID"
 
@@ -394,3 +442,51 @@ components:
       properties:
         orderId:
           $ref: "#/components/schemas/UUID"
+
+    AddCustomerToOrderRequest:
+      type: object
+      required:
+        - customerSalutation
+        - customerFirstName
+        - customerLastName
+        - email
+        - agreeToTerms
+      properties:
+        customerSalutation:
+          type: string
+          enum:
+            - Mr.
+            - Ms.
+            - Mx.
+          example: Mr.
+          description: Customer salutation title
+        customerFirstName:
+          type: string
+          minLength: 1
+          example: John
+          description: Customer first name
+        customerLastName:
+          type: string
+          minLength: 1
+          example: Doe
+          description: Customer last name
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: john.doe@example.com
+          description: Customer email address
+        agreeToTerms:
+          type: boolean
+          example: true
+          description: Whether customer agrees to terms and conditions
+
+    AddCustomerToOrderResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Customer added to order successfully
+          description: Success message

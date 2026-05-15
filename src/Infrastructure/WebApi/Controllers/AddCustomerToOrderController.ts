@@ -1,6 +1,6 @@
 import type { RouterContext, WebApiController } from '@/Infrastructure/WebApi/Shared/mod.ts';
 import type { Logger, UseCase } from '@/Application/Ports/mod.ts';
-import type { AddCustomerToOrderUseCaseInput} from '@/Application/Ticketing/Orders/mod.ts';
+import type { AddCustomerToOrderUseCaseInput } from '@/Application/Ticketing/Orders/mod.ts';
 
 export class AddCustomerToOrderController implements WebApiController {
     private readonly _useCase: UseCase<AddCustomerToOrderUseCaseInput, string>;
@@ -11,7 +11,7 @@ export class AddCustomerToOrderController implements WebApiController {
     }
     async handle(ctx: RouterContext<string>): Promise<void> {
         console.log('AddCustomerToOrderController handling request');
-        const orderId = ctx.params.id
+        const orderId = ctx.params.id;
 
         if (!orderId) {
             ctx.response.status = 400;
@@ -27,7 +27,7 @@ export class AddCustomerToOrderController implements WebApiController {
             customerFirstName: body.customerFirstName,
             customerLastName: body.customerLastName,
             email: body.email,
-            agreeToTerms: body.agreeToTerms
+            agreeToTerms: body.agreeToTerms,
         });
         const input: AddCustomerToOrderUseCaseInput = {
             orderId,
@@ -35,12 +35,11 @@ export class AddCustomerToOrderController implements WebApiController {
             customerFirstName: body.customerFirstName,
             customerLastName: body.customerLastName,
             email: body.email,
-            agreeToTerms: body.agreeToTerms
-        }
+            agreeToTerms: body.agreeToTerms,
+        };
         await this._useCase.execute(input);
         ctx.response.status = 200;
         ctx.response.body = { message: 'Customer added to order successfully' };
-
     }
     private validateBody(body: unknown): boolean {
         if (typeof body !== 'object' || body === null) {
@@ -58,6 +57,4 @@ export class AddCustomerToOrderController implements WebApiController {
             typeof payload.AgreeToTerms === 'boolean'
         );
     }
-
 }
-

@@ -1,13 +1,13 @@
 import type { Logger, UnitOfWork, UseCase } from '@/Application/Ports/mod.ts';
 
 import {
-    OrderId,
     Customer,
-    CustomerSalutation,
     CustomerFirstName,
-    CustomerLastName
+    CustomerLastName,
+    CustomerSalutation,
+    OrderId,
 } from '@/Domain/Ticketing/Orders/mod.ts';
-import type {  OrderRepository  } from '@/Domain/Ticketing/Orders/mod.ts';
+import type { OrderRepository } from '@/Domain/Ticketing/Orders/mod.ts';
 import { Email } from '@/Domain/Shared/ValueObjects/Email.ts';
 
 export interface AddCustomerToOrderUseCaseInput {
@@ -16,7 +16,7 @@ export interface AddCustomerToOrderUseCaseInput {
     customerFirstName: string;
     customerLastName: string;
     email: string;
-    agreeToTerms: boolean
+    agreeToTerms: boolean;
 }
 export class AddCustomerToOrder implements UseCase<AddCustomerToOrderUseCaseInput, string> {
     private readonly _unitOfWork: UnitOfWork;
@@ -43,7 +43,7 @@ export class AddCustomerToOrder implements UseCase<AddCustomerToOrderUseCaseInpu
             const order = orderOptional.getOrThrow(
                 `Order with ID ${input.orderId} should be present.`,
             );
-            if(input.agreeToTerms === true) {
+            if (input.agreeToTerms === true) {
                 order.acceptTerms();
             }
 
@@ -51,13 +51,12 @@ export class AddCustomerToOrder implements UseCase<AddCustomerToOrderUseCaseInpu
                 input.customerSalutation,
                 CustomerFirstName.create(input.customerFirstName),
                 CustomerLastName.create(input.customerLastName),
-                Email.create(input.email)
+                Email.create(input.email),
             );
             order.setCustomer(customer);
 
             await this._unitOfWork.save(order);
             return order.id.toString();
-
         });
         return result;
     }

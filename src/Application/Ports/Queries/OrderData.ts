@@ -1,5 +1,5 @@
 import type { Optional } from '@domaincrafters/std';
-import {CustomerData} from "./CustomerData.ts";
+import { CustomerData } from './CustomerData.ts';
 import { TicketData } from '@/Application/Ports/Queries/TicketData.ts';
 export interface OrderData {
     orderId: string;
@@ -7,7 +7,7 @@ export interface OrderData {
     status: string;
     price: number;
     agreeToTerms: boolean;
-    customer: CustomerData;
+    customer: CustomerData | null;
     tickets: TicketData[];
 }
 export interface FindOrderByBookingIdQueryPort {

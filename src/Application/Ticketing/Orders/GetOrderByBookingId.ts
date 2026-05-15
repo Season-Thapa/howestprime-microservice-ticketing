@@ -1,7 +1,4 @@
-import type {
-    OrderData,
-    FindOrderByBookingIdQueryPort
-} from "@/Application/Ports/Queries/mod.ts";
+import type { FindOrderByBookingIdQueryPort, OrderData } from '@/Application/Ports/Queries/mod.ts';
 import { UseCase } from '@/Application/Ports/UseCase.ts';
 
 export type GetOrderByBookingIdInput = {
@@ -10,9 +7,10 @@ export type GetOrderByBookingIdInput = {
 
 export type GetOrderByBookingIdOutput = OrderData;
 
-export class GetOrderByBookingId implements UseCase<GetOrderByBookingIdInput, GetOrderByBookingIdOutput> {
+export class GetOrderByBookingId
+    implements UseCase<GetOrderByBookingIdInput, GetOrderByBookingIdOutput> {
     private readonly _query: FindOrderByBookingIdQueryPort;
-    constructor( query: FindOrderByBookingIdQueryPort) {
+    constructor(query: FindOrderByBookingIdQueryPort) {
         this._query = query;
     }
     async execute(input: GetOrderByBookingIdInput): Promise<GetOrderByBookingIdOutput> {
@@ -22,5 +20,4 @@ export class GetOrderByBookingId implements UseCase<GetOrderByBookingIdInput, Ge
         }
         return resultOptional.value;
     }
-
 }

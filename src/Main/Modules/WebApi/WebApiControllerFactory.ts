@@ -10,18 +10,18 @@ import {
 import { SaveMovie, type SaveMovieInput } from '@/Application/Ticketing/Movies/mod.ts';
 import type { Logger, UseCase } from '@/Application/Ports/mod.ts';
 import type {
+    OrderData,
     SuggestionByIdReadModel,
     SuggestionListItemReadModel,
-    OrderData
 } from '@/Application/Ports/Queries/mod.ts';
 import {
     AddCustomerToOrderController,
     CreateOrderFromBookingController,
     CreateSuggestionController,
+    GetOrderByBookingIdController,
     GetSuggestionByIdController,
     ListSuggestionsController,
     SaveMovieController,
-    GetOrderByBookingIdController
 } from '@/Infrastructure/WebApi/Controllers/mod.ts';
 import {
     type ControllerFactory,
@@ -36,7 +36,7 @@ import {
     CreateOrderFromBooking,
     type CreateOrderFromBookingUseCaseInput,
     GetOrderByBookingId,
-    type GetOrderByBookingIdInput
+    type GetOrderByBookingIdInput,
 } from '@/Application/Ticketing/Orders/mod.ts';
 
 export class WebApiControllerFactory implements ControllerFactory {
@@ -66,7 +66,6 @@ export class WebApiControllerFactory implements ControllerFactory {
                 return await this.createAddCustomerToOrderController();
             case GetOrderByBookingIdController.name:
                 return await this.createGetOrderByBookingIdController();
-
 
             default:
                 throw new IllegalStateException(

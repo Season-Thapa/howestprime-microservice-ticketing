@@ -2,11 +2,11 @@ import { Optional } from '@domaincrafters/std';
 import { type Collection, type Document, type Filter } from '@mongodb';
 
 import type {
-    OrderData,
-    FindOrderByBookingIdQueryPort,
     CustomerData,
-    TicketData
-} from "@/Application/Ports/Queries/mod.ts";
+    FindOrderByBookingIdQueryPort,
+    OrderData,
+    TicketData,
+} from '@/Application/Ports/Queries/mod.ts';
 import { MongoDbClient } from '@/Infrastructure/Persistence/MongoDb/Shared/mod.ts';
 
 export class MongoDbGetOrderByBookingIdQuery implements FindOrderByBookingIdQueryPort {
@@ -16,40 +16,42 @@ export class MongoDbGetOrderByBookingIdQuery implements FindOrderByBookingIdQuer
     }
     async getOrderByBookingId(bookingId: string): Promise<Optional<OrderData>> {
         const filter: Filter<Document> = {
-            bookingId : bookingId
+            bookingId: bookingId,
         } as unknown as Filter<Document>;
         const document = await this._collection.findOne(filter);
 
         if (!document) {
             return Optional.empty<OrderData>();
         }
-       const doc = document.value;
-        const tickets: TicketData[] = (doc.tickets || []).map((ticket: Document) => ({
-            id: ticket.id,
+
+        const tickets: TicketData[] = (document.tickets || []).map((ticket: Document) => ({
+            ticketId: ticket.id,
             seatNumber: ticket.seatNumber,
             price: ticket.price,
             movieId: ticket.movieId,
             room: ticket.room,
-            showtime: ticket.showgtime
+            showtime: ticket.showtime,
+            visitorType: ticket.visitorType,
+        }));
 
-        }));
-        const customer: CustomerData = (doc.customers || null).map((customer: CustomerData) => ({
-            salutation: customer.salutation,
-            firstName: customer.firstName,
-            lastName: customer.lastName,
-            email: customer.email,
-        }));
+        const customer: CustomerData | null = document.customer
+            ? {
+                salutation: document.customer.salutation,
+                firstName: document.customer.firstName,
+                lastName: document.customer.lastName,
+                email: document.customer.email,
+            }
+            : null;
+
         const orderData: OrderData = {
-            orderId: doc._id.toString(),
-            bookingId: doc.bookingId,
-            status: doc.status,
-            price: doc.price,
-            agreeToTerms: doc.agreeToTerms,
+            orderId: document._id.toString(),
+            bookingId: document.bookingId,
+            status: document.status,
+            price: document.price,
+            agreeToTerms: document.agreeToTerms,
             customer,
-            tickets
-
-        }
+            tickets,
+        };
         return Optional.of<OrderData>(orderData);
-
     }
 }

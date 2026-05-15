@@ -212,6 +212,60 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerErrorProblem"
 
+  /api/orders/{bookingId}:
+    get:
+      tags:
+        - Orders
+      summary: Get order by booking id
+      operationId: getOrderByBookingId
+      description: Retrieve the details of an existing order using its booking id
+      parameters:
+        - $ref: "#/components/parameters/BookingId"
+      responses:
+        "200":
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderData"
+              examples:
+                orderWithCustomer:
+                  value:
+                    orderId: 3b7f0ab1-0db6-4b7a-85d8-9c1a4f3f8b2c
+                    bookingId: 1d3c4f5a-1111-2222-3333-444455556666
+                    status: Open
+                    price: 43.5
+                    agreeToTerms: false
+                    customer: null
+                    tickets:
+                      - ticketId: 5f6b1c2a-3c4d-5e6f-7a8b-9c0d1e2f3a4b
+                        movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                        room: Room A
+                        seatNumber: 12
+                        visitorType: standard
+                        price: 15.0
+                        showtime: "2026-05-15T18:30:00.000Z"
+                      - ticketId: 6g7c2d3b-4d5e-6f7g-8b9c-0d1e2f3g4b5c
+                        movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                        room: Room A
+                        seatNumber: 13
+                        visitorType: standard
+                        price: 15.0
+                        showtime: "2026-05-15T18:30:00.000Z"
+                      - ticketId: 7h8d3e4c-5e6f-7g8h-9c0d-1e2f3g4h5c6d
+                        movieId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                        room: Room A
+                        seatNumber: 14
+                        visitorType: discounted
+                        price: 13.5
+                        showtime: "2026-05-15T18:30:00.000Z"
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "404":
+          $ref: "#/components/responses/NotFoundProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
+
 components:
   parameters:
     SuggestionId:
@@ -226,6 +280,13 @@ components:
       in: path
       required: true
       description: Order identifier
+      schema:
+        $ref: "#/components/schemas/UUID"
+    BookingId:
+      name: bookingId
+      in: path
+      required: true
+      description: Booking identifier
       schema:
         $ref: "#/components/schemas/UUID"
 
@@ -475,3 +536,128 @@ components:
           type: boolean
           example: true
           description: Whether customer agrees to terms and conditions
+
+    OrderData:
+      type: object
+      required:
+        - orderId
+        - bookingId
+        - status
+        - price
+        - agreeToTerms
+        - tickets
+      properties:
+        orderId:
+          $ref: "#/components/schemas/UUID"
+          description: Unique identifier of the order
+        bookingId:
+          $ref: "#/components/schemas/UUID"
+          description: Reference to the associated booking
+        status:
+          type: string
+          enum:
+            - Open
+            - Paid
+            - TicketReleased
+            - Canceled
+          example: Open
+          description: Current order status
+        price:
+          type: number
+          format: double
+          minimum: 0
+          example: 43.5
+          description: Total price of the order
+        agreeToTerms:
+          type: boolean
+          example: false
+          description: Whether the customer accepted the terms
+        customer:
+          $ref: "#/components/schemas/CustomerData"
+          description: Customer details, or null if not yet added
+        tickets:
+          type: array
+          minItems: 1
+          items:
+            $ref: "#/components/schemas/TicketData"
+          description: List of tickets included in the order
+
+    CustomerData:
+      type: object
+      nullable: true
+      required:
+        - salutation
+        - firstName
+        - lastName
+        - email
+      properties:
+        salutation:
+          type: string
+          enum:
+            - Mr.
+            - Ms.
+            - Mx.
+          example: Mr.
+          description: Customer salutation title
+        firstName:
+          type: string
+          minLength: 1
+          example: John
+          description: Customer first name
+        lastName:
+          type: string
+          minLength: 1
+          example: Doe
+          description: Customer last name
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: john.doe@example.com
+          description: Customer email address
+
+    TicketData:
+      type: object
+      required:
+        - ticketId
+        - movieId
+        - room
+        - seatNumber
+        - visitorType
+        - price
+        - showtime
+      properties:
+        ticketId:
+          $ref: "#/components/schemas/UUID"
+          description: Unique identifier of the ticket
+        movieId:
+          $ref: "#/components/schemas/UUID"
+          description: Reference to the movie
+        room:
+          type: string
+          minLength: 1
+          example: Room A
+          description: Room or theater where the movie is shown
+        seatNumber:
+          type: integer
+          minimum: 1
+          example: 12
+          description: Seat number for the ticket
+        visitorType:
+          type: string
+          enum:
+            - standard
+            - discounted
+          example: standard
+          description: Type of visitor (standard or discounted)
+        price:
+          type: number
+          format: double
+          minimum: 0
+          example: 15.0
+          description: Price of the ticket
+        showtime:
+          type: string
+          format: date-time
+          example: "2026-05-15T18:30:00.000Z"
+          description: Date and time of the showing

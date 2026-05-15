@@ -2,10 +2,10 @@ import {
     AddCustomerToOrderController,
     CreateOrderFromBookingController,
     CreateSuggestionController,
+    GetOrderByBookingIdController,
     GetSuggestionByIdController,
     ListSuggestionsController,
     SaveMovieController,
-    GetOrderByBookingIdController
 } from '@/Infrastructure/WebApi/Controllers/mod.ts';
 import { type Router, RouterBuilder, type Routes } from '@/Infrastructure/WebApi/Shared/mod.ts';
 

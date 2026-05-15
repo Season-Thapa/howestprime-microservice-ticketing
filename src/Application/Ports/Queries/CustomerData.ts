@@ -1,4 +1,4 @@
-export interface CustomerData{
+export interface CustomerData {
     salutation: string;
     firstName: string;
     lastName: string;

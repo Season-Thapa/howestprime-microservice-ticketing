@@ -1,6 +1,6 @@
-import type { GetOrderByBookingIdInput} from "@/Application/Ticketing/Orders/mod.ts";
+import type { GetOrderByBookingIdInput } from '@/Application/Ticketing/Orders/mod.ts';
 import type { UseCase } from '@/Application/Ports/mod.ts';
-import type { OrderData} from "@/Application/Ports/Queries/mod.ts";
+import type { OrderData } from '@/Application/Ports/Queries/mod.ts';
 import {
     type RouterContext,
     type WebApiController,

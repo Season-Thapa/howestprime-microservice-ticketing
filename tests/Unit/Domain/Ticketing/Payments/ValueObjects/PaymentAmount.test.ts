@@ -11,5 +11,14 @@ Deno.test("PaymentAmount - valid and equals", () => {
 
 Deno.test("PaymentAmount - invalid throws", () => {
   assertThrows(() => PaymentAmount.create(0), InvalidPaymentAmountException);
+  assertThrows(() => PaymentAmount.create(-1), InvalidPaymentAmountException);
+  assertThrows(() => PaymentAmount.create(Number.POSITIVE_INFINITY), InvalidPaymentAmountException);
   assertThrows(() => PaymentAmount.create(Number.NaN), InvalidPaymentAmountException);
+});
+
+Deno.test("PaymentAmount - equals returns false for nullish values", () => {
+  const amount = PaymentAmount.create(10);
+
+  assertEquals(amount.equals(null as unknown as PaymentAmount), false);
+  assertEquals(amount.equals(undefined as unknown as PaymentAmount), false);
 });

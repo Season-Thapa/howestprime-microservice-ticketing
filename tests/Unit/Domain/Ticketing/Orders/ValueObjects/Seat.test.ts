@@ -29,6 +29,10 @@ Deno.test("Seat - throws error when seat number is negative", () => {
   assertThrows(() => Seat.create(-5, VisitorType.Standard), Error, "Seat number must be a valid positive integer.");
 });
 
+Deno.test("Seat - throws error when seat number is not an integer", () => {
+  assertThrows(() => Seat.create(1.5, VisitorType.Standard), Error, "Seat number must be a valid positive integer.");
+});
+
 Deno.test("Seat - treats equal seats as equal value objects", () => {
   // Arrange
   const seat1 = Seat.create(5, VisitorType.Standard);
@@ -54,6 +58,14 @@ Deno.test("Seat - treats seats with different visitor types as different", () =>
 
   // Act & Assert
   assertEquals(seat1.equals(seat2), false);
+});
+
+Deno.test("Seat - equals returns false for nullish and non-seat values", () => {
+  const seat = Seat.create(5, VisitorType.Standard);
+
+  assertEquals(seat.equals(null as unknown as Seat), false);
+  assertEquals(seat.equals(undefined as unknown as Seat), false);
+  assertEquals(seat.equals({ seatNumber: 5, visitorType: VisitorType.Standard } as unknown as Seat), false);
 });
 
 Deno.test("VisitorType - has Standard option", () => {

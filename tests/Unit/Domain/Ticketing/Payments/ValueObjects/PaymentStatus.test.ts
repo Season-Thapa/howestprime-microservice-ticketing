@@ -18,3 +18,18 @@ Deno.test("PaymentStatus - transitions and invalid transitions", () => {
   assertThrows(() => success.transitionTo(failed), InvalidPaymentStatusTransitionException);
   assertThrows(() => failed.transitionTo(success), InvalidPaymentStatusTransitionException);
 });
+
+Deno.test("PaymentStatus - rejects transition to same status", () => {
+  const pending = PaymentStatus.Pending;
+
+  assertThrows(() => pending.transitionTo(PaymentStatus.Pending), InvalidPaymentStatusTransitionException, "already in this status");
+});
+
+Deno.test("PaymentStatus - equals handles nullish and value getter", () => {
+  const pending = PaymentStatus.Pending;
+
+  assertEquals(pending.value, "Pending");
+  assertEquals(pending.equals(PaymentStatus.Pending), true);
+  assertEquals(pending.equals(PaymentStatus.Success), false);
+  assertEquals(pending.equals(null as unknown as PaymentStatus), false);
+});

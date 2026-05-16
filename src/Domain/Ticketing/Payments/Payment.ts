@@ -1,4 +1,4 @@
-import {AggregateRoot,  UUIDEntityId} from '@/Domain/Shared/mod.ts';
+import { AggregateRoot, UUIDEntityId } from '@/Domain/Shared/mod.ts';
 import { ExternalId } from './ValueObjects/ExternalId.ts';
 import { PaymentMethod } from './ValueObjects/PaymentMethod.ts';
 import { CardNumber } from './ValueObjects/CardNumber.ts';
@@ -12,7 +12,7 @@ import {
 } from '@/Domain/Ticketing/Payments/ValueObjects/PaymentStatus.ts';
 import { PaymentAmount } from './ValueObjects/PaymentAmount.ts';
 import { FailureReason } from './ValueObjects/FailureReason.ts';
-import { PaymentSuccess} from "./Events/PaymentSuccess.ts";
+import { PaymentSuccess } from './Events/PaymentSuccess.ts';
 import { PaymentFailed } from './Events/PaymentFailed.ts';
 
 export class PaymentId extends UUIDEntityId {
@@ -58,7 +58,7 @@ export class Payment extends AggregateRoot<PaymentId> {
         this._bookingId = bookingId;
         this._amount = amount;
         this._status = status;
-        this._externalId = externalId ;
+        this._externalId = externalId;
     }
 
     static create(
@@ -69,7 +69,7 @@ export class Payment extends AggregateRoot<PaymentId> {
         orderId: OrderId,
         bookingId: BookingId,
         amount: PaymentAmount,
-        externalId: ExternalId
+        externalId: ExternalId,
     ): Payment {
         const payment = new Payment(
             PaymentId.create(),
@@ -81,7 +81,7 @@ export class Payment extends AggregateRoot<PaymentId> {
             bookingId,
             amount,
             PaymentStatus.create(PaymentStatusState.Pending),
-            externalId
+            externalId,
         );
         return payment;
     }
@@ -98,8 +98,7 @@ export class Payment extends AggregateRoot<PaymentId> {
                 this._orderId.value,
                 this._bookingId.value,
             ),
-        )
-
+        );
     }
 
     public markAsFailed(reason: FailureReason): void {
@@ -113,10 +112,9 @@ export class Payment extends AggregateRoot<PaymentId> {
                 this.id.value,
                 this._orderId.value,
                 this._bookingId.value,
-                reason.value
-            )
+                reason.value,
+            ),
         );
-
     }
     get paymentMethod(): PaymentMethod {
         return this._paymentMethod;

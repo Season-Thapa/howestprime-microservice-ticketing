@@ -1,4 +1,4 @@
-import { Entity, UUIDEntityId } from '@/Domain/Shared/mod.ts';
+import {AggregateRoot,  UUIDEntityId} from '@/Domain/Shared/mod.ts';
 import { ExternalId } from './ValueObjects/ExternalId.ts';
 import { PaymentMethod } from './ValueObjects/PaymentMethod.ts';
 import { CardNumber } from './ValueObjects/CardNumber.ts';
@@ -12,6 +12,8 @@ import {
 } from '@/Domain/Ticketing/Payments/ValueObjects/PaymentStatus.ts';
 import { PaymentAmount } from './ValueObjects/PaymentAmount.ts';
 import { FailureReason } from './ValueObjects/FailureReason.ts';
+import { PaymentSuccess} from "./Events/PaymentSuccess.ts";
+import { PaymentFailed } from './Events/PaymentFailed.ts';
 
 export class PaymentId extends UUIDEntityId {
     private constructor(id?: string) {
@@ -23,8 +25,8 @@ export class PaymentId extends UUIDEntityId {
     }
 }
 
-export class Payment extends Entity<PaymentId> {
-    private _externalId: ExternalId | null;
+export class Payment extends AggregateRoot<PaymentId> {
+    private _externalId: ExternalId;
     private readonly _paymentMethod: PaymentMethod;
     private readonly _cardNumber: CardNumber;
     private readonly _expiryDate: ExpiryDate;
@@ -44,7 +46,7 @@ export class Payment extends Entity<PaymentId> {
         bookingId: BookingId,
         amount: PaymentAmount,
         status: PaymentStatus,
-        externalId: ExternalId | null = null,
+        externalId: ExternalId,
     ) {
         super(id);
         this._externalId = externalId;
@@ -56,7 +58,7 @@ export class Payment extends Entity<PaymentId> {
         this._bookingId = bookingId;
         this._amount = amount;
         this._status = status;
-        this._externalId = externalId;
+        this._externalId = externalId ;
     }
 
     static create(
@@ -65,8 +67,9 @@ export class Payment extends Entity<PaymentId> {
         expiryDate: ExpiryDate,
         cvv: CVV,
         orderId: OrderId,
-        bokingId: BookingId,
+        bookingId: BookingId,
         amount: PaymentAmount,
+        externalId: ExternalId
     ): Payment {
         const payment = new Payment(
             PaymentId.create(),
@@ -75,21 +78,28 @@ export class Payment extends Entity<PaymentId> {
             expiryDate,
             cvv,
             orderId,
-            bokingId,
+            bookingId,
             amount,
             PaymentStatus.create(PaymentStatusState.Pending),
-            null,
+            externalId
         );
         return payment;
     }
 
     public markAsSuccess(externalId: ExternalId): void {
-        // Assuming your PaymentStatus has a getter for the state value underneath
         if (this._status.value !== PaymentStatusState.Pending) {
             throw new Error('A payment can only be marked as succeeded when it is still pending.');
         }
         this._status = PaymentStatus.create(PaymentStatusState.Success);
         this._externalId = externalId;
+        this.raise(
+            PaymentSuccess.create(
+                this.id.value,
+                this._orderId.value,
+                this._bookingId.value,
+            ),
+        )
+
     }
 
     public markAsFailed(reason: FailureReason): void {
@@ -98,6 +108,15 @@ export class Payment extends Entity<PaymentId> {
         }
         this._status = PaymentStatus.create(PaymentStatusState.Failed);
         reason == reason || FailureReason.create('Unknown failure reason');
+        this.raise(
+            PaymentFailed.create(
+                this.id.value,
+                this._orderId.value,
+                this._bookingId.value,
+                reason.value
+            )
+        );
+
     }
     get paymentMethod(): PaymentMethod {
         return this._paymentMethod;
@@ -131,7 +150,7 @@ export class Payment extends Entity<PaymentId> {
         return this._status;
     }
 
-    get externalId(): ExternalId | null {
+    get externalId(): ExternalId {
         return this._externalId;
     }
 }

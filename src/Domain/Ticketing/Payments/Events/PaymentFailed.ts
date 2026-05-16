@@ -3,7 +3,7 @@ import { PaymentDomainEvent } from './PaymentDomainEvent.ts';
 
 export class PaymentFailed extends PaymentDomainEvent {
     static readonly FQDN: EventFQDN = EventFQDN.create(
-        `${PaymentDomainEvent.FQDN_PREFIX}.success`,
+        `${PaymentDomainEvent.FQDN_PREFIX}.failed`,
     );
 
     private readonly _paymentId: string;
@@ -28,8 +28,8 @@ export class PaymentFailed extends PaymentDomainEvent {
     static create(
         paymentId: string,
         orderId: string,
-        reason: string,
         bookingId: string,
+        reason: string,
     ): PaymentFailed {
         return new PaymentFailed(
             paymentId,

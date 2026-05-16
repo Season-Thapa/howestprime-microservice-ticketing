@@ -212,6 +212,50 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerErrorProblem"
 
+  /api/orders/{orderId}/payments:
+    post:
+      tags:
+        - Payments
+      summary: Pay an order
+      operationId: payOrder
+      description: Processes a payment for an existing order and returns the created payment identifier
+      parameters:
+        - $ref: "#/components/parameters/OrderId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PayOrderRequest"
+            examples:
+              payOrder:
+                value:
+                  externalId: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+                  paymentMethod: Credit Card
+                  cardNumber: "4111111111111111"
+                  expiryDate: "12/28"
+                  cvv: "123"
+                  bookingId: 1d3c4f5a-1111-2222-3333-444455556666
+                  amount: 42.5
+      responses:
+        "201":
+          description: Payment created
+          headers:
+            Location:
+              $ref: "#/components/headers/Location"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayOrderResponse"
+              examples:
+                created:
+                  value:
+                    paymentId: 9b8f3a5a-0c2c-4a5a-9c1a-2c7ed5d2f9b1
+        "400":
+          $ref: "#/components/responses/BadRequestProblem"
+        "500":
+          $ref: "#/components/responses/InternalServerErrorProblem"
+
   /api/orders/{bookingId}:
     get:
       tags:
@@ -536,6 +580,66 @@ components:
           type: boolean
           example: true
           description: Whether customer agrees to terms and conditions
+
+    PayOrderRequest:
+      type: object
+      required:
+        - externalId
+        - paymentMethod
+        - cardNumber
+        - expiryDate
+        - cvv
+        - bookingId
+        - amount
+      properties:
+        externalId:
+          type: string
+          format: uuid
+          example: 8fdd8b8e-8de4-4b9a-8e16-868b72f4f469
+          description: Identifier used by the payment provider
+        paymentMethod:
+          type: string
+          enum:
+            - Credit Card
+            - Bank Transfer
+          example: Credit Card
+          description: Selected payment method
+        cardNumber:
+          type: string
+          minLength: 12
+          maxLength: 19
+          example: "4111111111111111"
+          description: Card number to charge
+        expiryDate:
+          type: string
+          minLength: 4
+          maxLength: 7
+          example: "12/28"
+          description: Card expiry date
+        cvv:
+          type: string
+          minLength: 3
+          maxLength: 4
+          example: "123"
+          description: Card security code
+        bookingId:
+          $ref: "#/components/schemas/UUID"
+          description: Booking identifier associated with the order
+        amount:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 42.5
+          description: Amount to charge
+
+    PayOrderResponse:
+      type: object
+      required:
+        - paymentId
+      properties:
+        paymentId:
+          $ref: "#/components/schemas/UUID"
+          description: Identifier of the created payment
 
     OrderData:
       type: object

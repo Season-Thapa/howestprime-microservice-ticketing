@@ -94,6 +94,34 @@ channels:
           type: topic
           routingKey: howestprime.ticketing.orders.addcustomertoorder
 
+  howestprime.ticketing.payment.paymentsuccess:
+    address: howestprime.ticketing.payment.paymentsuccess
+    title: Payment success
+    messages:
+      PaymentSuccess:
+        $ref: "#/components/messages/PaymentSuccess"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: howestprime.ticketing.payment.paymentsuccess
+
+  howestprime.ticketing.payment.paymentfailed:
+    address: howestprime.ticketing.payment.paymentfailed
+    title: Payment failed
+    messages:
+      PaymentFailed:
+        $ref: "#/components/messages/PaymentFailed"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: howestprime.ticketing.payment.paymentfailed
+
 operations:
   WhenSuggestionSendCreateSuggestion:
     action: receive
@@ -145,6 +173,26 @@ operations:
     messages:
       - $ref: "#/channels/howestprime.ticketing.orders.addcustomertoorder/messages/AddCustomerToOrder"
 
+  SendPaymentSuccess:
+    action: send
+    channel:
+      $ref: "#/channels/howestprime.ticketing.payment.paymentsuccess"
+    description: |
+      Triggered after a payment has been processed successfully.
+      Publishes the payment success payload for downstream consumers.
+    messages:
+      - $ref: "#/channels/howestprime.ticketing.payment.paymentsuccess/messages/PaymentSuccess"
+
+  SendPaymentFailed:
+    action: send
+    channel:
+      $ref: "#/channels/howestprime.ticketing.payment.paymentfailed"
+    description: |
+      Triggered after a payment has failed.
+      Publishes the payment failure payload for downstream consumers.
+    messages:
+      - $ref: "#/channels/howestprime.ticketing.payment.paymentfailed/messages/PaymentFailed"
+
 components:
   messages:
     SuggestionSendCreateSuggestion:
@@ -181,6 +229,20 @@ components:
       summary: Command message to add customer information and terms acceptance to an order.
       payload:
         $ref: "#/components/schemas/AddCustomerToOrderPayload"
+
+    PaymentSuccess:
+      name: PaymentSuccess
+      title: Payment success
+      summary: Event message emitted after a payment succeeds.
+      payload:
+        $ref: "#/components/schemas/PaymentSuccessPayload"
+
+    PaymentFailed:
+      name: PaymentFailed
+      title: Payment failed
+      summary: Event message emitted after a payment fails.
+      payload:
+        $ref: "#/components/schemas/PaymentFailedPayload"
 
   schemas:
     SuggestionSendCreateSuggestionPayload:
@@ -379,3 +441,54 @@ components:
           type: boolean
           description: Whether customer agrees to terms and conditions.
           example: true
+
+    PaymentSuccessPayload:
+      type: object
+      required:
+        - paymentId
+        - orderId
+        - bookingId
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+          description: Identifier of the payment.
+          example: 9b8f3a5a-0c2c-4a5a-9c1a-2c7ed5d2f9b1
+        orderId:
+          type: string
+          format: uuid
+          description: Identifier of the order.
+          example: 5ec4499c-fd90-4255-aa6a-c744b24302d6
+        bookingId:
+          type: string
+          format: uuid
+          description: Identifier of the booking.
+          example: 1d3c4f5a-1111-2222-3333-444455556666
+
+    PaymentFailedPayload:
+      type: object
+      required:
+        - paymentId
+        - orderId
+        - bookingId
+        - reason
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+          description: Identifier of the payment.
+          example: 9b8f3a5a-0c2c-4a5a-9c1a-2c7ed5d2f9b1
+        orderId:
+          type: string
+          format: uuid
+          description: Identifier of the order.
+          example: 5ec4499c-fd90-4255-aa6a-c744b24302d6
+        bookingId:
+          type: string
+          format: uuid
+          description: Identifier of the booking.
+          example: 1d3c4f5a-1111-2222-3333-444455556666
+        reason:
+          type: string
+          description: Reason why the payment failed.
+          example: Payment declined by provider

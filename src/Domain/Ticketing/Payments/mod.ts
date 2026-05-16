@@ -11,9 +11,9 @@ export {
 export {
     CVV
 } from './ValueObjects/CVV.ts';
-export { PaymentMethod, type PaymentMethodType } from './ValueObjects/PaymentMethod.ts';
+export { PaymentMethod, PaymentMethodType } from './ValueObjects/PaymentMethod.ts';
 export { PaymentAmount } from './ValueObjects/PaymentAmount.ts';
-export { PaymentStatus } from './ValueObjects/PaymentStatus.ts';
+export { PaymentStatus, PaymentStatusState } from './ValueObjects/PaymentStatus.ts';
 export { PaymentFailed } from './Events/PaymentFailed.ts';
 export { PaymentSuccess } from './Events/PaymentSuccess.ts';
 export { ExternalId } from './ValueObjects/ExternalId.ts';

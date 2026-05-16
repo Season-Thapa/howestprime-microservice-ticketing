@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 
-import { PaymentStatus } from "@/Domain/Ticketing/Payments/mod.ts";
+import { PaymentStatus, InvalidPaymentStatusTransitionException } from "@/Domain/Ticketing/Payments/mod.ts";
 
 Deno.test("PaymentStatus - transitions and invalid transitions", () => {
   const pending = PaymentStatus.Pending;
@@ -15,6 +15,6 @@ Deno.test("PaymentStatus - transitions and invalid transitions", () => {
   assertEquals(toFailed.equals(failed), true);
 
   // invalid transitions
-  assertThrows(() => success.transitionTo(failed), Error);
-  assertThrows(() => failed.transitionTo(success), Error);
+  assertThrows(() => success.transitionTo(failed), InvalidPaymentStatusTransitionException);
+  assertThrows(() => failed.transitionTo(success), InvalidPaymentStatusTransitionException);
 });

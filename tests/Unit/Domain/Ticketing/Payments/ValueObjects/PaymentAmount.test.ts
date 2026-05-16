@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 
-import { PaymentAmount } from "@/Domain/Ticketing/Payments/mod.ts";
+import { PaymentAmount, InvalidPaymentAmountException } from "@/Domain/Ticketing/Payments/mod.ts";
 
 Deno.test("PaymentAmount - valid and equals", () => {
   const a = PaymentAmount.create(19.99);
@@ -10,6 +10,6 @@ Deno.test("PaymentAmount - valid and equals", () => {
 });
 
 Deno.test("PaymentAmount - invalid throws", () => {
-  assertThrows(() => PaymentAmount.create(0), Error);
-  assertThrows(() => PaymentAmount.create(Number.NaN), Error);
+  assertThrows(() => PaymentAmount.create(0), InvalidPaymentAmountException);
+  assertThrows(() => PaymentAmount.create(Number.NaN), InvalidPaymentAmountException);
 });

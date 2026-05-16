@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 
-import { ExpiryDate } from "@/Domain/Ticketing/Payments/mod.ts";
+import { ExpiryDate, InvalidExpiryDataException } from "@/Domain/Ticketing/Payments/mod.ts";
 
 Deno.test("ExpiryDate - valid and equals", () => {
   const e = ExpiryDate.create("12/28");
@@ -9,5 +9,5 @@ Deno.test("ExpiryDate - valid and equals", () => {
 });
 
 Deno.test("ExpiryDate - invalid throws", () => {
-  assertThrows(() => ExpiryDate.create("13/20"), Error);
+  assertThrows(() => ExpiryDate.create("13/20"), InvalidExpiryDataException);
 });

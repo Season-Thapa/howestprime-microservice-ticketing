@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from "@std/assert";
 
-import { CardNumber } from "@/Domain/Ticketing/Payments/mod.ts";
+
+import { CardNumber, InvalidCardException } from "@/Domain/Ticketing/Payments/mod.ts";
 
 Deno.test("CardNumber - valid and equals", () => {
   const a = CardNumber.create("4111 1111-1111 1111");
@@ -10,5 +11,5 @@ Deno.test("CardNumber - valid and equals", () => {
 });
 
 Deno.test("CardNumber - invalid throws", () => {
-  assertThrows(() => CardNumber.create("123"), Error);
+  assertThrows(() => CardNumber.create("123"), InvalidCardException);
 });

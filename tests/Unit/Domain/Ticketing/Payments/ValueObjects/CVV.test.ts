@@ -1,6 +1,6 @@
 import { assertEquals, assertThrows } from "@std/assert";
 
-import { CVV } from "@/Domain/Ticketing/Payments/mod.ts";
+import { CVV, InvalidCVVException } from "@/Domain/Ticketing/Payments/mod.ts";
 
 Deno.test("CVV - valid and equals", () => {
   const c = CVV.create("123");
@@ -10,5 +10,5 @@ Deno.test("CVV - valid and equals", () => {
 });
 
 Deno.test("CVV - invalid throws", () => {
-  assertThrows(() => CVV.create("12a"), Error);
+  assertThrows(() => CVV.create("12a"), InvalidCVVException);
 });

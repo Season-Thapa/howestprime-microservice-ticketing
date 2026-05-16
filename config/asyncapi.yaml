@@ -122,6 +122,20 @@ channels:
           type: topic
           routingKey: howestprime.ticketing.payment.paymentfailed
 
+  howestprime.ticketing.order.ticketreleased:
+    address: howestprime.ticketing.order.ticketreleased
+    title: Tickets released
+    messages:
+      TicketReleased:
+        $ref: "#/components/messages/TicketReleased"
+    bindings:
+      amqp:
+        is: routingKey
+        exchange:
+          name: howestprime
+          type: topic
+          routingKey: howestprime.ticketing.order.ticketreleased
+
 operations:
   WhenSuggestionSendCreateSuggestion:
     action: receive
@@ -193,6 +207,16 @@ operations:
     messages:
       - $ref: "#/channels/howestprime.ticketing.payment.paymentfailed/messages/PaymentFailed"
 
+  SendTicketReleased:
+    action: send
+    channel:
+      $ref: "#/channels/howestprime.ticketing.order.ticketreleased"
+    description: |
+      Triggered after an order has been paid and the tickets have been released.
+      Publishes the released ticket payload for downstream consumers.
+    messages:
+      - $ref: "#/channels/howestprime.ticketing.order.ticketreleased/messages/TicketReleased"
+
 components:
   messages:
     SuggestionSendCreateSuggestion:
@@ -243,6 +267,13 @@ components:
       summary: Event message emitted after a payment fails.
       payload:
         $ref: "#/components/schemas/PaymentFailedPayload"
+
+    TicketReleased:
+      name: TicketReleased
+      title: Tickets released
+      summary: Event message emitted after an order is paid and its tickets are released.
+      payload:
+        $ref: "#/components/schemas/TicketReleasedPayload"
 
   schemas:
     SuggestionSendCreateSuggestionPayload:
@@ -492,3 +523,95 @@ components:
           type: string
           description: Reason why the payment failed.
           example: Payment declined by provider
+
+    TicketReleasedPayload:
+      type: object
+      required:
+        - orderId
+        - tickets
+        - occurredOn
+      properties:
+        orderId:
+          type: string
+          format: uuid
+          description: Identifier of the order.
+          example: 5ec4499c-fd90-4255-aa6a-c744b24302d6
+        customer:
+          oneOf:
+            - type: "null"
+            - type: object
+              required:
+                - salutation
+                - firstname
+                - lastname
+                - email
+              properties:
+                salutation:
+                  type: string
+                  description: Customer salutation.
+                  example: Mr.
+                firstname:
+                  type: string
+                  description: Customer first name.
+                  example: John
+                lastname:
+                  type: string
+                  description: Customer last name.
+                  example: Doe
+                email:
+                  type: string
+                  format: email
+                  description: Customer email address.
+                  example: john.doe@example.com
+        tickets:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - ticketId
+              - movieId
+              - room
+              - seatNumber
+              - visitorType
+              - price
+              - showtime
+            properties:
+              ticketId:
+                type: string
+                format: uuid
+                description: Identifier of the released ticket.
+                example: 1b8f3a5a-0c2c-4a5a-9c1a-2c7ed5d2f9b1
+              movieId:
+                type: string
+                format: uuid
+                description: Identifier of the movie.
+                example: 9d3b3cf0-81a6-4f07-aad8-8f5d56f1c2d1
+              room:
+                type: string
+                description: Room where the show takes place.
+                example: Room A
+              seatNumber:
+                type: integer
+                minimum: 1
+                description: Seat number assigned to the ticket.
+                example: 12
+              visitorType:
+                type: string
+                description: Visitor type for the ticket.
+                example: standard
+              price:
+                type: number
+                format: float
+                description: Ticket price.
+                example: 15.0
+              showtime:
+                type: string
+                format: date-time
+                description: Show start time.
+                example: "2026-05-15T18:30:00.000Z"
+        occurredOn:
+          type: string
+          format: date-time
+          description: UTC timestamp when the event occurred.
+          example: "2026-05-16T10:15:30.000Z"

@@ -20,8 +20,8 @@ import {
   MarkOrderAsPaid,
   type MarkOrderAsPaidInput,
   WhenOrderPaidThenReleaseTickets,
-  ReleaseTicket,
-  type ReleaseTicketInput,
+  ReleaseTickets,
+  type ReleaseTicketsInput,
 } from "@/Application/Ticketing/Orders/mod.ts";
 import { type PayOrderInput, PayOrderUseCase } from "@/Application/Ticketing/Payments/mod.ts";
 import { WhenPaymentSucceededThenMarkOrderAsPaid } from "@/Application/Ticketing/Payments/mod.ts";
@@ -137,12 +137,12 @@ export class Application implements Module {
 
       return useCase;
     });
-    serviceCollection.addScoped(ReleaseTicket.name, async (serviceProvider: ServiceProvider) => {
+    serviceCollection.addScoped(ReleaseTickets.name, async (serviceProvider: ServiceProvider) => {
       const unitOfWork = (await serviceProvider.getService<MongoDbUnitOfWork>(MongoDbUnitOfWork.name)).getOrThrow();
 
       const logger = (await serviceProvider.getService<Logger>(ConsoleLogger.name)).getOrThrow();
 
-      const useCase: UseCase<ReleaseTicketInput, void> = new ReleaseTicket(unitOfWork, logger);
+      const useCase: UseCase<ReleaseTicketsInput, void> = new ReleaseTickets(unitOfWork, logger);
 
       return useCase;
     });
@@ -161,7 +161,7 @@ export class Application implements Module {
       return new WhenPaymentSucceededThenMarkOrderAsPaid(markOrderAsPaidUseCase);
     });
     serviceCollection.addScoped(WhenOrderPaidThenReleaseTickets.name, async (serviceProvider: ServiceProvider) => {
-      const releaseTicketUseCase = (await serviceProvider.getService<ReleaseTicket>(ReleaseTicket.name)).getOrThrow();
+      const releaseTicketUseCase = (await serviceProvider.getService<ReleaseTickets>(ReleaseTickets.name)).getOrThrow();
 
       return new WhenOrderPaidThenReleaseTickets(releaseTicketUseCase);
     });

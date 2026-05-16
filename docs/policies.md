@@ -55,4 +55,48 @@ This document lists application-layer policies: event-driven, internal handlers 
 
 ---
 
+## FR07 — WhenOrderPaidThenReleaseTickets
+
+- **Trigger (internal event):** `OrderPaid` domain event
+  - FQDN: `howestprime.ticketing.order.order-paid`
+  - Emitted by: `Order` aggregate when payment succeeds and the order becomes paid
+- **Policy class:** `WhenOrderPaidThenReleaseTickets`
+  - Location: `src/Application/Ticketing/Orders/WhenOrderPaidThenReleaseTickets.ts`
+  - Behavior: resolves the `ReleaseTicket` use case and calls it with `{ orderId: <event.orderId> }`
+- **Use case executed:** `ReleaseTickets`
+  - Location: `src/Application/Ticketing/Orders/ReleaseTicket.ts`
+  - Input: `{ orderId: string }`
+  - Action: loads the `Order` aggregate, calls `order.releaseTickets()`, persists the order, and emits the release event with ticket/customer data
+- **Policy registration:**
+  - Mapping: `src/Application/Policies.ts` — maps `OrderPaid.FQDN` → `[WhenOrderPaidThenReleaseTickets.name]`
+  - DI registration: policy and use case are registered in the application module: `src/Main/Modules/Application/Module.ts` (scoped services)
+- **Pre-conditions:**
+  1. `OrderPaid` event is received
+  2. Related order exists
+  3. Order status is `Paid`
+- **Post-conditions:**
+  1. Order status becomes `TicketReleased`
+  2. Release event is published with ticket and optional customer information
+
+### How it runs at runtime
+
+1. `Order` raises `OrderPaid` after the payment policy marks it as paid.
+2. `PolicyDomainEventListener` resolves `WhenOrderPaidThenReleaseTickets` and executes it.
+3. The policy resolves `ReleaseTicket`, which loads the `Order`, calls `releaseTickets()`, persists the aggregate, and publishes the release event.
+
+### How to test
+
+- Unit tests:
+  - Test `WhenOrderPaidThenReleaseTickets` by providing a mock `ReleaseTicket` use case and asserting it receives the correct order id.
+  - Test `ReleaseTicket` by mocking the `UnitOfWork` and `Order` repository to verify `order.releaseTickets()` is called and the order is saved.
+- Integration / manual test (happy path):
+  1. Start MongoDB + LavinMQ and the service.
+  2. Create an `Order` (POST `/api/orders/from-booking`).
+  3. Add customer (POST `/api/orders/{orderId}/customer`) and accept terms.
+  4. Pay the order (POST `/api/orders/{orderId}/payments`) with a successful gateway response.
+  5. Verify order status via GET `/api/orders/{bookingId}` — should be `TicketReleased`.
+  6. (Optional) Bind a queue in LavinMQ to `howestprime.ticketing.order.ticketreleased` and verify the release message is published.
+
+---
+
 Document created to satisfy FR06 policy documentation requirement.

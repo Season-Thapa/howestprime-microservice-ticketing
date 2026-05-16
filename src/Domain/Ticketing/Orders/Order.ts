@@ -4,6 +4,7 @@ import { Money } from '../../Shared/ValueObjects/Money.ts';
 import { Customer } from './Entities/Customer.ts';
 import { Ticket } from './Entities/Ticket.ts';
 import { BookingId } from './ValueObjects/BookingId.ts';
+import { OrderPaid } from './Events/OrderPaid.ts';
 
 export class OrderId extends UUIDEntityId {
     private constructor(id?: string) {
@@ -108,6 +109,10 @@ export class Order extends AggregateRoot<OrderId> {
             throw new Error('Order can only be paid after terms are accepted.');
         }
         this._status = OrderStatus.create(OrderStatusState.Paid);
+        this.raise(OrderPaid.create(
+            this.id.value,
+            this.bookingId.value
+            ));
     }
     public releaseTickets(): void {
         if (this._status.value !== OrderStatusState.Paid) {

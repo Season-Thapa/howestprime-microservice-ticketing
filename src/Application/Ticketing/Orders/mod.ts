@@ -4,4 +4,6 @@ export {
 } from './CreateOrderFromBooking.ts';
 export { AddCustomerToOrder, type AddCustomerToOrderUseCaseInput } from './AddCustomerToOrder.ts';
 export { GetOrderByBookingId, type GetOrderByBookingIdInput } from './GetOrderByBookingId.ts';
-export { type MarkOrderAsPaidInput, MarkOrderAsPaid } from './MarkOrderAsPaid.ts';
+export { MarkOrderAsPaid, type MarkOrderAsPaidInput } from './MarkOrderAsPaid.ts';
+export { WhenOrderPaidThenReleaseTickets } from './WhenOrderPaidThenReleaseTickets.ts';
+export { type ReleaseTicketInput, ReleaseTicket } from './ReleaseTicket.ts';

@@ -15,10 +15,13 @@ import {
   type AddCustomerToOrderUseCaseInput,
   CreateOrderFromBooking,
   type CreateOrderFromBookingUseCaseInput,
-  MarkOrderAsPaid,
-  type MarkOrderAsPaidInput,
   GetOrderByBookingId,
   type GetOrderByBookingIdInput,
+  MarkOrderAsPaid,
+  type MarkOrderAsPaidInput,
+  WhenOrderPaidThenReleaseTickets,
+  ReleaseTicket,
+  type ReleaseTicketInput,
 } from "@/Application/Ticketing/Orders/mod.ts";
 import { type PayOrderInput, PayOrderUseCase } from "@/Application/Ticketing/Payments/mod.ts";
 import { WhenPaymentSucceededThenMarkOrderAsPaid } from "@/Application/Ticketing/Payments/mod.ts";
@@ -134,6 +137,15 @@ export class Application implements Module {
 
       return useCase;
     });
+    serviceCollection.addScoped(ReleaseTicket.name, async (serviceProvider: ServiceProvider) => {
+      const unitOfWork = (await serviceProvider.getService<MongoDbUnitOfWork>(MongoDbUnitOfWork.name)).getOrThrow();
+
+      const logger = (await serviceProvider.getService<Logger>(ConsoleLogger.name)).getOrThrow();
+
+      const useCase: UseCase<ReleaseTicketInput, void> = new ReleaseTicket(unitOfWork, logger);
+
+      return useCase;
+    });
   }
 
   private addPolicies(serviceCollection: ServiceCollection): void {
@@ -147,6 +159,11 @@ export class Application implements Module {
       const markOrderAsPaidUseCase = (await serviceProvider.getService<MarkOrderAsPaid>(MarkOrderAsPaid.name)).getOrThrow();
 
       return new WhenPaymentSucceededThenMarkOrderAsPaid(markOrderAsPaidUseCase);
+    });
+    serviceCollection.addScoped(WhenOrderPaidThenReleaseTickets.name, async (serviceProvider: ServiceProvider) => {
+      const releaseTicketUseCase = (await serviceProvider.getService<ReleaseTicket>(ReleaseTicket.name)).getOrThrow();
+
+      return new WhenOrderPaidThenReleaseTickets(releaseTicketUseCase);
     });
   }
 

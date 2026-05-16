@@ -1,17 +1,17 @@
-import type { PaymentRepository} from "@/Domain/Ticketing/Payments/mod.ts";
-import { Payment, PaymentId} from "@/Domain/Ticketing/Payments/mod.ts";
+import type { PaymentRepository } from '@/Domain/Ticketing/Payments/mod.ts';
+import { Payment, PaymentId } from '@/Domain/Ticketing/Payments/mod.ts';
 import {
     MongoDbClient,
     MongoDbRepository,
 } from '@/Infrastructure/Persistence/MongoDb/Shared/mod.ts';
-import {PaymentDocumentMapper} from "./Mappers/PaymentDocumentMapper.ts";
-import {OrderId} from "@/Domain/Ticketing/Orders/mod.ts";
+import { PaymentDocumentMapper } from './Mappers/PaymentDocumentMapper.ts';
+import { OrderId } from '@/Domain/Ticketing/Orders/mod.ts';
 import type { Document, Filter } from '@mongodb';
 import { Optional } from '@domaincrafters/std';
 
-
-export class MongoDbPaymentRepository extends MongoDbRepository<Payment, PaymentId> implements PaymentRepository {
-     static override readonly collectionName: string = 'payments';
+export class MongoDbPaymentRepository extends MongoDbRepository<Payment, PaymentId>
+    implements PaymentRepository {
+    static override readonly collectionName: string = 'payments';
 
     constructor(
         client: MongoDbClient,
@@ -40,5 +40,4 @@ export class MongoDbPaymentRepository extends MongoDbRepository<Payment, Payment
     override get entityName(): string {
         return Payment.name;
     }
-
 }

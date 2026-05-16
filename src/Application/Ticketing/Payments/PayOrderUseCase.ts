@@ -1,6 +1,6 @@
 import type { Logger, UnitOfWork, UseCase } from "@/Application/Ports/mod.ts";
 import type { PaymentService } from "@/Application/Ports/Gateways/mod.ts";
-import { BookingId, OrderId } from "@/Domain/Ticketing/Orders/mod.ts";
+import {BookingId, OrderId, OrderRepository} from "@/Domain/Ticketing/Orders/mod.ts";
 import {
   CVV,
   CardNumber,
@@ -43,6 +43,20 @@ export class PayOrderUseCase implements UseCase<PayOrderInput, string> {
       externalId: input.externalId,
     });
     const result = await this._unitOfWork.do<string>(async () => {
+      // Validate order exists and bookingId belongs to that order
+      const orderRepository = this._unitOfWork.getRepository<OrderRepository>("Order");
+      const orderId = OrderId.create(input.orderId);
+      const orderOptional = await orderRepository.findById(orderId);
+
+      if (!orderOptional.isPresent) {
+        throw new Error(`Order with ID ${input.orderId} not found. Ensure OrderCreated event was processed.`);
+      }
+
+      const order = orderOptional.getOrThrow(`Order with ID ${input.orderId} should be present.`);
+      if (order.bookingId.toString() !== input.bookingId) {
+        throw new Error(`Booking ID ${input.bookingId} does not match order ${input.orderId}.`);
+      }
+
       const payment = Payment.create(
         PaymentMethod.create(input.paymentMethod),
         CardNumber.create(input.cardNumber),

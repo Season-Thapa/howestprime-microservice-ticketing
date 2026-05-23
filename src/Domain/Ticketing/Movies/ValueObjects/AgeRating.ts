@@ -18,8 +18,7 @@ export class AgeRating extends ValueObject {
     }
 
     protected validate(): void {
-        const trimmedValue = this._value?.trim();
-        if (!trimmedValue || trimmedValue === '') {
+        if(!this._value ) {
             throw new InvalidAgeRatingException(this._value);
         }
     }

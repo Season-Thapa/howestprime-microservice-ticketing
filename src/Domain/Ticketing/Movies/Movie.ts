@@ -8,7 +8,8 @@ import { Money } from '../../Shared/ValueObjects/Money.ts';
 
 export class MovieId extends UUIDEntityId {
     private constructor(id: string) {
-        super(id);
+        super();
+        (this as any)._id = id;
     }
 
     static create(value: string): MovieId {

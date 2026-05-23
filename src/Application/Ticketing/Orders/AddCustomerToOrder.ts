@@ -12,9 +12,9 @@ import { Email } from '@/Domain/Shared/ValueObjects/Email.ts';
 
 export interface AddCustomerToOrderUseCaseInput {
     orderId: string;
-    customerSalutation: CustomerSalutation;
-    customerFirstName: string;
-    customerLastName: string;
+    salutation: CustomerSalutation;
+    firstName: string;
+    lastName: string;
     email: string;
     agreeToTerms: boolean;
 }
@@ -48,9 +48,9 @@ export class AddCustomerToOrder implements UseCase<AddCustomerToOrderUseCaseInpu
             }
 
             const customer = Customer.create(
-                input.customerSalutation,
-                CustomerFirstName.create(input.customerFirstName),
-                CustomerLastName.create(input.customerLastName),
+                input.salutation,
+                CustomerFirstName.create(input.firstName),
+                CustomerLastName.create(input.lastName),
                 Email.create(input.email),
             );
             order.setCustomer(customer);

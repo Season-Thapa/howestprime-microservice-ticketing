@@ -33,7 +33,7 @@ export class MongoDbOrderRepository extends MongoDbRepository<Order, OrderId>
     }
     async byBookingId(bookingId: BookingId): Promise<Optional<Order>> {
         const filter = {
-            bookingId: bookingId,
+            bookingId: bookingId.value,
         } as unknown as Filter<Document>;
         const document = await this._dbClient.findDocument(
             filter,

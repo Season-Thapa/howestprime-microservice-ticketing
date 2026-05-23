@@ -7,6 +7,7 @@ import {
     WebApiResult,
 } from '@/Infrastructure/WebApi/Shared/mod.ts';
 import { IllegalArgumentException } from '@domaincrafters/std';
+import {NotFoundApplicationException} from "@/Application/Shared/mod.ts";
 
 export class GetOrderByBookingIdController implements WebApiController {
     constructor(
@@ -17,8 +18,11 @@ export class GetOrderByBookingIdController implements WebApiController {
     ) {}
     async handle(ctx: RouterContext<string>): Promise<void> {
         const bookingId = this.extractBookingId(ctx);
-        const orderData = await this._getOrderByBookingIdUseCase.execute({ bookingId });
-        WebApiResult.ok(ctx, orderData);
+        try {
+            const orderData = await this._getOrderByBookingIdUseCase.execute({ bookingId });
+            WebApiResult.ok(ctx, orderData);
+        } catch {
+            throw new NotFoundApplicationException(`Order not found for booking ID: ${bookingId}`);        }
     }
     private extractBookingId(ctx: RouterContext<string>): string {
         const bookingId = ctx.params.bookingId;

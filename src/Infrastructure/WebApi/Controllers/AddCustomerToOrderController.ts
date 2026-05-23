@@ -18,21 +18,25 @@ export class AddCustomerToOrderController implements WebApiController {
             return;
         }
         const body = await ctx.request.body.json();
-        if (!this.validateBody(body)) {
-            ctx.throw(400, 'Invalid input for order from customer');
-        }
+
+
+
         this._logger.debug('AddCustomerToOrderController - Received request', {
-            customerSalutation: body.customerSalutation,
-            customerFirstName: body.customerFirstName,
-            customerLastName: body.customerLastName,
+            salutation: body.salutation,
+            firstName: body.firstName,
+            lastName: body.lastName,
             email: body.email,
             agreeToTerms: body.agreeToTerms,
         });
+        if (!this.validateBody(body)) {
+            ctx.throw(400, 'Invalid input for order from customer');
+        }
+
         const input: AddCustomerToOrderUseCaseInput = {
             orderId,
-            customerSalutation: body.customerSalutation,
-            customerFirstName: body.customerFirstName,
-            customerLastName: body.customerLastName,
+            salutation: body.salutation,
+            firstName: body.firstName,
+            lastName: body.lastName,
             email: body.email,
             agreeToTerms: body.agreeToTerms,
         };
@@ -47,9 +51,9 @@ export class AddCustomerToOrderController implements WebApiController {
         const payload = body as Record<string, unknown>;
 
         return (
-            typeof payload.customerSalutation === 'string' &&
-            typeof payload.customerFirstName === 'string' &&
-            typeof payload.customerLastName === 'string' &&
+            typeof payload.salutation === 'string' &&
+            typeof payload.firstName === 'string' &&
+            typeof payload.lastName === 'string' &&
             typeof payload.email === 'string' &&
             typeof payload.agreeToTerms === 'boolean'
         );

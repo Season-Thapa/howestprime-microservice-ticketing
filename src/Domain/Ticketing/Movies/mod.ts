@@ -7,3 +7,4 @@ export { AgeRating, InvalidAgeRatingException } from './ValueObjects/AgeRating.t
 export { Genre, InvalidGenreException } from './ValueObjects/Genre.ts';
 export { InvalidMovieDurationException, MovieDuration } from './ValueObjects/MovieDuration.ts';
 export { InvalidPosterUrlException, PosterUrl } from './ValueObjects/PosterUrl.ts';
+

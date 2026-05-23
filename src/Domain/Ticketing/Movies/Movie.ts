@@ -1,4 +1,4 @@
-import { AggregateRoot, UUIDEntityId } from '@/Domain/Shared/mod.ts';
+import { AggregateRoot, UUIDEntityId, ExternalMovieId } from '@/Domain/Shared/mod.ts';
 import { MovieTitle } from './ValueObjects/MovieTitle.ts';
 import { AgeRating } from './ValueObjects/AgeRating.ts';
 import { Genre, InvalidGenreException } from './ValueObjects/Genre.ts';
@@ -15,7 +15,9 @@ export class MovieId extends UUIDEntityId {
         return new MovieId(value);
     }
 }
+
 export class Movie extends AggregateRoot<MovieId> {
+    private readonly _externalMovieId: ExternalMovieId;
     private readonly _title: MovieTitle;
     private readonly _ageRating: AgeRating;
     private readonly _genres: Genre[];
@@ -25,6 +27,7 @@ export class Movie extends AggregateRoot<MovieId> {
 
     private constructor(
         id: MovieId,
+        externalMovieId: ExternalMovieId,
         title: MovieTitle,
         ageRating: AgeRating,
         genres: Genre[],
@@ -33,6 +36,7 @@ export class Movie extends AggregateRoot<MovieId> {
         price: Money,
     ) {
         super(id);
+        this._externalMovieId = externalMovieId;
         this._title = title;
         this._ageRating = ageRating;
         this._genres = genres;
@@ -43,6 +47,7 @@ export class Movie extends AggregateRoot<MovieId> {
 
     static create(
         id: MovieId,
+        externalMovieId: ExternalMovieId,
         title: MovieTitle,
         ageRating: AgeRating,
         genre: Genre[],
@@ -52,6 +57,7 @@ export class Movie extends AggregateRoot<MovieId> {
         const calculatedPrice = Money.create(movieDuration.duration * 0.15);
         const movie = new Movie(
             id,
+            externalMovieId,
             title,
             ageRating,
             genre,
@@ -74,7 +80,9 @@ export class Movie extends AggregateRoot<MovieId> {
     get genres(): Genre[] {
         return this._genres;
     }
-
+  get externalMovieId(): ExternalMovieId {
+        return this._externalMovieId;
+    }
     get duration(): MovieDuration {
         return this._movieDuration;
     }

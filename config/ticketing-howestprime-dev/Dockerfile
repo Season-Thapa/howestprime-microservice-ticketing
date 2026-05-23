@@ -1,13 +1,8 @@
-FROM denoland/deno:alpine
-
-EXPOSE 8000
+FROM denoland/deno:2.2.4
 
 WORKDIR /app
 
-USER deno
+COPY . .
+RUN rm -rf node_modules && rm -rf data && deno cache src/Main/Main.ts
 
-COPY --chown=deno:deno . .
-
-RUN deno cache src/Main/main.ts
-
-CMD ["run", "--allow-net", "--allow-env", "--allow-read", "main.ts"]
+CMD ["run", "--allow-env", "--allow-net", "--allow-read", "--allow-write", "--allow-run", "--allow-sys", "src/Main/Main.ts"]

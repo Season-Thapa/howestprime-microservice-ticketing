@@ -1,87 +1,110 @@
-import type { CreateOrderFromBookingUseCaseInput } from '@/Application/Ticketing/Orders/CreateOrderFromBooking.ts';
 import type { UseCase } from '@/Application/Ports/mod.ts';
 import type { AmqpController } from '@/Infrastructure/Messaging/LavinMQ/Shared/mod.ts';
+import type { CreateOrderFromBookingUseCaseInput } from '@/Application/Ticketing/Orders/CreateOrderFromBooking.ts';
 import { IllegalArgumentException } from '@domaincrafters/std';
+
 export interface CreateOrderFromBookingRequest {
     bookingId: unknown;
-    movieId: unknown;
+    externalMovieId: unknown;
+    movieId: unknown; // ✅ backward compatibility (IMPORTANT FIX)
     room: unknown;
     showtime: unknown;
     standardVisitors: unknown;
-    discountedVisitors: unknown;
+    discountVisitors: unknown;
     seatNumbers: unknown;
 }
+
 export class CreateOrderFromBookingController
     implements AmqpController<CreateOrderFromBookingRequest> {
+
     constructor(
-        private readonly _createOrderFromBookingUseCase: UseCase<
-            CreateOrderFromBookingUseCaseInput,
-            string
-        >,
-    ) {
-    }
+        private readonly _useCase: UseCase<CreateOrderFromBookingUseCaseInput, string>,
+    ) {}
 
     async handle(request: CreateOrderFromBookingRequest): Promise<void> {
-        const input = this.extractInput(request as unknown);
-        await this._createOrderFromBookingUseCase.execute(input);
-    }
-    private extractInput(request: unknown): CreateOrderFromBookingUseCaseInput {
-        if (request === null || typeof request !== 'object') {
-            throw new IllegalArgumentException('Suggestion create payload must be a JSON object.');
+        console.log('=== INCOMING AMQP MESSAGE START ===');
+        console.log(JSON.stringify(request, null, 2));
+        console.log('=== INCOMING AMQP MESSAGE END ===');
+        try {
+            const input = this.extractInput(request as unknown);
+
+            console.log('📦 Parsed AMQP payload', input); // Fallback log;
+
+            const result = await this._useCase.execute(input);
+            console.log('✅ Order created from booking event', {
+                orderId: result,
+                bookingId: input.bookingId, });
+        } catch (error) {
+            // 🔥 IMPORTANT: log full failure context
+            console.error('❌ Failed to process booking event', {
+                error,
+                raw: request,
+            });
+
+            throw error;
         }
-        const payload = request as Record<string, unknown>;
-        const body = Object.hasOwn(payload, 'payload')
-            ? (payload.payload as Record<string, unknown>)
-            : payload;
+    }
+
+    private extractInput(request: unknown): CreateOrderFromBookingUseCaseInput {
+        if (typeof request !== 'object' || request === null) {
+            throw new IllegalArgumentException('Invalid AMQP payload');
+        }
+
+
+        const body = request as Record<string, unknown>;
 
         return {
-            bookingId: this.requireNonEmptyString(body.bookingId, 'bookingId'),
-            movieId: this.requireNonEmptyString(body.movieId, 'movieId'),
-            room: this.requireNonEmptyString(body.room, 'Room'),
-            showtime: this.requireNonEmptyString(body.showtime, 'Showtime'),
-            standardVisitors: this.requireNumber(body.standardVisitors, 'StandardVisitors'),
-            discountedVisitors: this.requireNumber(body.discountedVisitors, 'DiscountedVisitors'),
-            seatNumbers: this.requireNumberArray(body.seatNumbers, 'SeatNumbers'),
+            bookingId: this.requireString(body.bookingId, 'bookingId'),
+
+            // ✅ FIX: accept both old and new contracts
+            externalMovieId: this.requireString(
+                body.externalMovieId ?? body.movieId,
+                'externalMovieId',
+            ),
+
+            room: this.requireString(body.room, 'room'),
+            showtime: this.requireString(body.showtime, 'showtime'),
+
+            standardVisitors: this.requireNumber(body.standardVisitors, 'standardVisitors'),
+
+            discountVisitors: this.requireNumber(
+                body.discountVisitors ?? body.discountedVisitors ?? 0,
+                'discountVisitors',
+            ),
+
+            seatNumbers: this.normalizeSeatNumbers(body.seatNumbers),
         };
     }
-    private requireNonEmptyString(value: unknown, fieldName: string): string {
-        if (typeof value !== 'string') {
-            throw new IllegalArgumentException(`Field '${fieldName}' must be a string.`);
-        }
 
-        if (value.trim().length === 0) {
-            throw new IllegalArgumentException(`Field '${fieldName}' must not be empty.`);
+    private requireString(value: unknown, field: string): string {
+        if (typeof value !== 'string' || value.trim().length === 0) {
+            throw new IllegalArgumentException(`Field '${field}' must be a non-empty string.`);
         }
-
         return value;
     }
 
-    private requireNumber(value: unknown, fieldName: string): number {
-        if (typeof value !== 'number') {
-            throw new IllegalArgumentException(`Field '${fieldName}' must be a number.`);
+    private requireNumber(value: unknown, field: string): number {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+            throw new IllegalArgumentException(`Field '${field}' must be a number.`);
         }
-
         return value;
     }
 
-    private requireNumberArray(value: unknown, fieldName: string): number[] {
+    private normalizeSeatNumbers(value: unknown): number[] {
         if (!Array.isArray(value)) {
-            throw new IllegalArgumentException(`Field '${fieldName}' must be an array.`);
+            return [];
         }
 
-        const arr = value as unknown[];
-        if (arr.length === 0) {
-            throw new IllegalArgumentException(`Field '${fieldName}' must not be empty.`);
-        }
+        return value.map((v) => {
+            const n = typeof v === 'string' ? Number(v) : v;
 
-        for (const v of arr) {
-            if (typeof v !== 'number') {
+            if (typeof n !== 'number' || !Number.isFinite(n)) {
                 throw new IllegalArgumentException(
-                    `All entries in '${fieldName}' must be non-empty number.`,
+                    `Invalid seat number: ${v}`,
                 );
             }
-        }
 
-        return arr as number[];
+            return n;
+        });
     }
 }

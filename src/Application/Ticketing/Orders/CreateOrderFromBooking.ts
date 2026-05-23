@@ -2,17 +2,17 @@ import type { Logger, UnitOfWork, UseCase } from '@/Application/Ports/mod.ts';
 import type { MovieRepository } from '@/Domain/Ticketing/Movies/mod.ts';
 
 import { BookingId, MovieInfo, Order } from '@/Domain/Ticketing/Orders/mod.ts';
-import { MovieId } from '@/Domain/Ticketing/Movies/mod.ts';
+import { ExternalMovieId } from '../../../Domain/Shared/ValueObjects/ExternalMovieId.ts';
 import { Seat, VisitorType } from '@/Domain/Ticketing/Orders/ValueObjects/Seat.ts';
 import { Ticket } from '@/Domain/Ticketing/Orders/Entities/Ticket.ts';
 
 export interface CreateOrderFromBookingUseCaseInput {
     bookingId: string;
-    movieId: string;
+    externalMovieId: string;
     room: string;
     showtime: string;
     standardVisitors: number;
-    discountedVisitors: number;
+    discountVisitors: number;
     seatNumbers: number[];
 }
 export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUseCaseInput, string> {
@@ -25,7 +25,7 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
     }
     async execute(input: CreateOrderFromBookingUseCaseInput): Promise<string> {
         this._logger.debug('Creating Order from booking', { input });
-        const totalVisitors = input.standardVisitors + input.discountedVisitors;
+        const totalVisitors = input.standardVisitors + input.discountVisitors;
         if (input.seatNumbers.length !== totalVisitors) {
             throw new Error(
                 `Mismatch: Provided ${input.seatNumbers.length} seats for ${totalVisitors} visitors.`,
@@ -33,21 +33,21 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
         }
         const result = await this._unitOfWork.do<string>(async () => {
             const movieRepository = this._unitOfWork.getRepository<MovieRepository>('Movie');
-            const movieId = MovieId.create(input.movieId);
-            const movieOptional = await movieRepository.findById(movieId);
+            const externalMovieId = ExternalMovieId.create(input.externalMovieId);
+            const movieOptional = await movieRepository.findByExternalMovieId(externalMovieId);
 
             if (!movieOptional.isPresent) {
                 throw new Error(
-                    `Movie with ID ${input.movieId} not found. Ensure MovieRegistered event was processed.`,
+                    `Movie with ID ${input.externalMovieId} not found. Ensure MovieRegistered event was processed.`,
                 );
             }
 
             const movie = movieOptional.getOrThrow(
-                `Movie with ID ${input.movieId} should be present.`,
+                `Movie with ID ${input.externalMovieId} should be present.`,
             );
 
             const movieInfo = MovieInfo.create(
-                movie.id,
+                movie.externalMovieId,
                 movie.title,
                 movie.duration,
                 movie.genres,

@@ -2,7 +2,7 @@ import type { Optional } from '@domaincrafters/std';
 import { CustomerData } from './CustomerData.ts';
 import { TicketData } from '@/Application/Ports/Queries/TicketData.ts';
 export interface OrderData {
-    orderId: string;
+    id: string;
     bookingId: string;
     status: string;
     price: number;

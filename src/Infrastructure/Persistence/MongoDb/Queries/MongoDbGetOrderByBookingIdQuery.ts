@@ -44,7 +44,7 @@ export class MongoDbGetOrderByBookingIdQuery implements FindOrderByBookingIdQuer
             : null;
 
         const orderData: OrderData = {
-            orderId: document._id.toString(),
+            id: document._id.toString(),
             bookingId: document.bookingId,
             status: document.status,
             price: document.price,

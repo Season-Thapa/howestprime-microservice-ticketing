@@ -73,7 +73,10 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
 
             this._logger.info('Created Order from booking', { order });
             await this._unitOfWork.save(order);
-            return order.id.toString();
+            this._logger.info('Order value:', { orderId: order.id.value });
+            this._logger.info('Order string', { orderId: order.id.toString() });
+
+            return order.id.value;
         });
         return result;
     }

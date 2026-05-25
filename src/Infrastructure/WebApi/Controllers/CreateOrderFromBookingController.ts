@@ -38,6 +38,7 @@ export class CreateOrderFromBookingController implements WebApiController {
         });
 
         ctx.response.status = 201;
+        this._logger.info('Order created', { orderId: id });
         ctx.response.body = { orderId: id };
     }
 

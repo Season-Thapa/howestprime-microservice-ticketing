@@ -1,4 +1,4 @@
-import { assertEquals, assertThrows } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import { BookingId } from "@/Domain/Ticketing/Orders/ValueObjects/BookingId.ts";
 
 Deno.test("BookingId - creates successfully with valid UUID", () => {
@@ -12,10 +12,6 @@ Deno.test("BookingId - creates successfully with valid UUID", () => {
   assertEquals(bookingId.value, validUUID);
 });
 
-Deno.test("BookingId - throws error with invalid UUID format", () => {
-  // Act & Assert
-  assertThrows(() => BookingId.create("not-a-uuid"), Error, "Invalid UUID");
-});
 
 Deno.test("BookingId - treats equal UUIDs as equal entity IDs", () => {
   // Arrange

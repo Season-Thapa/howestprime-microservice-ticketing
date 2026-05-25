@@ -64,12 +64,11 @@ Deno.test("AddCustomerToOrder - successfully adds customer and accepts terms", a
   });
 
   const useCase = new AddCustomerToOrder(mockUow, mockLogger);
-
   const input: AddCustomerToOrderUseCaseInput = {
     orderId,
-    customerSalutation: CustomerSalutation.Mr,
-    customerFirstName: "John",
-    customerLastName: "Doe",
+    salutation: CustomerSalutation.Mr,
+    firstName: "John",
+    lastName: "Doe",
     email: "john.doe@example.com",
     agreeToTerms: true,
   };
@@ -110,9 +109,9 @@ Deno.test("AddCustomerToOrder - throws error when order does not exist", async (
 
   const input: AddCustomerToOrderUseCaseInput = {
     orderId,
-    customerSalutation: CustomerSalutation.Mr,
-    customerFirstName: "John",
-    customerLastName: "Doe",
+    salutation: CustomerSalutation.Mr,
+    firstName: "John",
+    lastName: "Doe",
     email: "john.doe@example.com",
     agreeToTerms: true,
   };

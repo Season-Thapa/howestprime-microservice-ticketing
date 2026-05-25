@@ -69,7 +69,7 @@ Deno.test("GetOrderByBookingId - successfully retrieves order by booking id", as
   const result = await useCase.execute(input);
 
   // Assert
-  assertEquals(result.orderId, orderData.orderId);
+  assertEquals(result.id, orderData.id);
   assertEquals(result.bookingId, bookingId);
   assertEquals(result.status, "Open");
   assertEquals(result.price, 45.0);

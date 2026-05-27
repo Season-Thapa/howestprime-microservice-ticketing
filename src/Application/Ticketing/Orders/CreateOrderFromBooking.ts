@@ -66,14 +66,12 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
                 const ticket = Ticket.create(movieInfo, seat, input.room, showtimeDate);
                 tickets.push(ticket);
             }
-            var bookingId: BookingId = BookingId.create(input.bookingId);
+            const bookingId: BookingId = BookingId.create(input.bookingId);
 
             const order = Order.create(bookingId, tickets);
 
             this._logger.info('Created Order from booking', { order });
             await this._unitOfWork.save(order);
-            this._logger.info('Order value:', { orderId: order.id.value });
-            this._logger.info('Order string', { orderId: order.id.toString() });
 
             return order.id.value;
         });

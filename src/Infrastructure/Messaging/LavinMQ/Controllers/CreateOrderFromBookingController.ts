@@ -14,19 +14,17 @@ export interface CreateOrderFromBookingRequest {
 }
 export class CreateOrderFromBookingController
     implements AmqpController<CreateOrderFromBookingRequest> {
-    private readonly _createOrderFromBookingUseCase: UseCase<
-        CreateOrderFromBookingUseCaseInput,
-        string
-    >;
     constructor(
-        createOrderFromBookingUseCase: UseCase<CreateOrderFromBookingUseCaseInput, string>,
+        private readonly createOrderFromBookingUseCase: UseCase<
+            CreateOrderFromBookingUseCaseInput,
+            string
+        >,
     ) {
-        this._createOrderFromBookingUseCase = createOrderFromBookingUseCase;
     }
 
     async handle(request: CreateOrderFromBookingRequest): Promise<void> {
         const input: CreateOrderFromBookingUseCaseInput = this.validateInput(request);
-        await this._createOrderFromBookingUseCase.execute(input);
+        await this.createOrderFromBookingUseCase.execute(input);
     }
     private validateInput(
         request: CreateOrderFromBookingRequest,
@@ -38,7 +36,7 @@ export class CreateOrderFromBookingController
 
         return {
             bookingId: request.bookingId,
-            externalId: request.movieId,
+            movieId: request.movieId,
             room: request.room,
             showtime: request.showtime,
             standardVisitors: request.standardVisitors,

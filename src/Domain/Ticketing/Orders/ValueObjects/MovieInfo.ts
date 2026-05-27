@@ -1,5 +1,4 @@
-import { ValueObject } from '@/Domain/Shared/mod.ts';
-import { MovieId } from '../../Movies/Movie.ts';
+import { ValueObject, ExternalMovieId } from '@/Domain/Shared/mod.ts';
 import { MovieTitle } from '../../Movies/ValueObjects/MovieTitle.ts';
 import { MovieDuration } from '../../Movies/ValueObjects/MovieDuration.ts';
 import { Genre } from '../../Movies/ValueObjects/Genre.ts';
@@ -8,7 +7,7 @@ import { AgeRating } from '../../Movies/ValueObjects/AgeRating.ts';
 import { Money } from '../../../Shared/ValueObjects/Money.ts';
 
 export class MovieInfo extends ValueObject {
-    private readonly _id: MovieId;
+    private readonly _id: ExternalMovieId;
     private readonly _title: MovieTitle;
     private readonly _duration: MovieDuration;
     private readonly _genres: Genre[];
@@ -17,7 +16,7 @@ export class MovieInfo extends ValueObject {
     private readonly _price: Money;
 
     private constructor(
-        id: MovieId,
+        id: ExternalMovieId,
         title: MovieTitle,
         duration: MovieDuration,
         genres: Genre[],
@@ -36,7 +35,7 @@ export class MovieInfo extends ValueObject {
     }
 
     public static create(
-        id: MovieId,
+        id: ExternalMovieId,
         title: MovieTitle,
         duration: MovieDuration,
         genres: Genre[],
@@ -47,7 +46,7 @@ export class MovieInfo extends ValueObject {
         return new MovieInfo(id, title, duration, genres, posterUrl, ageRating, price);
     }
 
-    get id(): MovieId {
+    get id(): ExternalMovieId {
         return this._id;
     }
 

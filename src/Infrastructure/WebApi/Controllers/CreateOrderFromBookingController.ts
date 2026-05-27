@@ -23,17 +23,20 @@ export class CreateOrderFromBookingController implements WebApiController {
             room: payload.room,
             showtime: payload.showtime,
             standardVisitors: payload.standardVisitors,
-            discountedVisitors: payload.discountedVisitors,
+            discountVisitors: payload.discountVisitors,
             seatNumbers: payload.seatNumbers,
         });
 
-        const id: string = await this._useCase.execute({
+        const id = await this._useCase.execute({
             bookingId: payload.bookingId as string,
-            movieId: payload.movieId as string,
+
+            // ✅ normalization happens here
+            externalMovieId: payload.movieId as string,
+
             room: payload.room as string,
             showtime: payload.showtime as string,
-            standardVisitors: payload.standardVisitors as number,
-            discountedVisitors: payload.discountedVisitors as number,
+            standardVisitors: Number(payload.standardVisitors),
+            discountVisitors: Number(payload.discountVisitors),
             seatNumbers: payload.seatNumbers as number[],
         });
 
@@ -43,9 +46,7 @@ export class CreateOrderFromBookingController implements WebApiController {
     }
 
     private validateBody(body: unknown): boolean {
-        if (typeof body !== 'object' || body === null) {
-            return false;
-        }
+        if (typeof body !== 'object' || body === null) return false;
 
         const payload = body as Record<string, unknown>;
 
@@ -55,7 +56,7 @@ export class CreateOrderFromBookingController implements WebApiController {
             typeof payload.room === 'string' &&
             typeof payload.showtime === 'string' &&
             typeof payload.standardVisitors === 'number' &&
-            typeof payload.discountedVisitors === 'number' &&
+            typeof payload.discountVisitors === 'number' &&
             Array.isArray(payload.seatNumbers)
         );
     }

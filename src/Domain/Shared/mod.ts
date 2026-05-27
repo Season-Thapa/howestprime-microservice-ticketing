@@ -13,7 +13,7 @@ export { UUIDEntityId } from './UUIDEntityId.ts';
 export { type Repository } from './Repository.ts';
 export { MathRandomProvider, type RandomProvider } from './RandomProvider.ts';
 export { Money } from './ValueObjects/Money.ts';
-export { MovieTitle, InvalidMovieTitleException } from './ValueObjects/MovieTitle.ts';
+export { InvalidMovieTitleException, MovieTitle } from './ValueObjects/MovieTitle.ts';
 export { AgeRating, InvalidAgeRatingException } from './ValueObjects/AgeRating.ts';
 export { Genre, InvalidGenreException } from './ValueObjects/Genre.ts';
 export { InvalidMovieDurationException, MovieDuration } from './ValueObjects/MovieDuration.ts';

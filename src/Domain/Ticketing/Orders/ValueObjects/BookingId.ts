@@ -3,7 +3,7 @@ import { UUIDEntityId } from '@/Domain/Shared/mod.ts';
 export class BookingId extends UUIDEntityId {
     private constructor(id: string) {
         super();
-        (this as any)._id = id;
+        (this as Record<string, unknown>)._id = id;
     }
 
     static create(value: string): BookingId {

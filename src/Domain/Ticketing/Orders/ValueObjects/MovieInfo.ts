@@ -9,7 +9,7 @@ import { Money } from '../../../Shared/ValueObjects/Money.ts';
 
 export class MovieInfo extends ValueObject {
     private readonly _id: MovieId;
-    private readonly _externalId : string;
+    private readonly _externalId: string;
     private readonly _title: MovieTitle;
     private readonly _duration: MovieDuration;
     private readonly _genres: Genre[];
@@ -29,7 +29,7 @@ export class MovieInfo extends ValueObject {
     ) {
         super();
         this._id = id;
-        this._externalId = externalId
+        this._externalId = externalId;
         this._title = title;
         this._duration = duration;
         this._genres = genres;
@@ -48,7 +48,7 @@ export class MovieInfo extends ValueObject {
         ageRating: AgeRating,
         price: Money,
     ): MovieInfo {
-        return new MovieInfo(id,externalId, title, duration, genres, posterUrl, ageRating, price);
+        return new MovieInfo(id, externalId, title, duration, genres, posterUrl, ageRating, price);
     }
 
     get id(): MovieId {

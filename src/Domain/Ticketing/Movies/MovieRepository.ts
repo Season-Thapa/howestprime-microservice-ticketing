@@ -6,5 +6,4 @@ import { Optional } from '@domaincrafters/std';
 export interface MovieRepository extends Repository<Movie, MovieId> {
     findById(id: MovieId): Promise<Optional<Movie>>;
     findByExternalMovieId(externalId: string): Promise<Optional<Movie>>;
-
 }

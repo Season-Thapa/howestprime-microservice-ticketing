@@ -36,10 +36,10 @@ export class MovieRegisteredController implements AmqpController<MovieRegistered
             externalId: this.requireNonEmptyString(body.movieId, 'movieId'),
             title: this.requireNonEmptyString(body.title, 'title'),
             duration: this.requireNumber(
-                (body.duration as any)?.value ?? body.duration,
+                (body.duration as { value?: number })?.value ?? body.duration,
                 'duration',
             ),
-            ageRating: this.requireNumber((body.ageRating as any)?.value ?? body.ageRating, 'ageRating'),
+            ageRating: String(body.ageRating),
             genres: this.requireStringArray(body.genres, 'genres'),
             posterUrl: this.requireNonEmptyString(body.posterUrl, 'posterUrl'),
         };

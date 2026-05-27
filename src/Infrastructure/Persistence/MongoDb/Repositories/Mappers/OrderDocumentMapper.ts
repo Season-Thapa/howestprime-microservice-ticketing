@@ -21,15 +21,8 @@ import { Ticket, TicketId } from '@/Domain/Ticketing/Orders/Entities/Ticket.ts';
 import { CustomerFirstName } from '@/Domain/Ticketing/Orders/ValueObjects/CustomerFirstName.ts';
 import { CustomerLastName } from '@/Domain/Ticketing/Orders/ValueObjects/CustomerLastName.ts';
 import { Seat, VisitorType } from '@/Domain/Ticketing/Orders/ValueObjects/Seat.ts';
-import {
-    AgeRating,
-    Genre,
-    MovieDuration,
-    MovieTitle,
-    PosterUrl,
-} from '@/Domain/Shared/mod.ts'
-import {  MovieId } from '@/Domain/Ticketing/Movies/mod.ts';
-
+import { AgeRating, Genre, MovieDuration, MovieTitle, PosterUrl } from '@/Domain/Shared/mod.ts';
+import { MovieId } from '@/Domain/Ticketing/Movies/mod.ts';
 
 interface CustomerDocumentShape {
     id: string;
@@ -87,7 +80,7 @@ export class OrderDocumentMapper implements DocumentMapper<Order> {
                 id: ticket.id.value,
                 movieInfo: {
                     id: ticket.movieInfo.id.value,
-                    externalId:ticket.movieInfo.externalId,
+                    externalId: ticket.movieInfo.externalId,
                     title: ticket.movieInfo.title.value,
                     duration: ticket.movieInfo.duration.duration,
                     genres: ticket.movieInfo.genres.map((genre) => genre.value),

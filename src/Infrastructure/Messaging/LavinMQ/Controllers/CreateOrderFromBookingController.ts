@@ -23,6 +23,9 @@ export class CreateOrderFromBookingController
     }
 
     async handle(request: CreateOrderFromBookingRequest): Promise<void> {
+        console.log('=== INCOMING AMQP MESSAGE START ===');
+        console.log(JSON.stringify(request, null, 2));
+        console.log('=== INCOMING AMQP MESSAGE END ===');
         const input: CreateOrderFromBookingUseCaseInput = this.validateInput(request);
         await this.createOrderFromBookingUseCase.execute(input);
     }

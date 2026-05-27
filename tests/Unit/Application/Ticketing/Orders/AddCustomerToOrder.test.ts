@@ -4,7 +4,8 @@ import { Optional } from "@domaincrafters/std";
 import { AddCustomerToOrder, type AddCustomerToOrderUseCaseInput } from "@/Application/Ticketing/Orders/AddCustomerToOrder.ts";
 import { createMockUnitOfWork } from "@/tests/Unit/Application/Shared/mod.ts";
 import type { Logger } from "@/Application/Ports/mod.ts";
-import { AgeRating, Genre, MovieId, MovieTitle, MovieDuration, PosterUrl } from "@/Domain/Ticketing/Movies/mod.ts";
+import { AgeRating, Genre, MovieDuration, PosterUrl } from "@/Domain/Shared/mod.ts";
+import { MovieId, MovieTitle } from "@/Domain/Ticketing/Movies/mod.ts";
 import { BookingId, CustomerFirstName, CustomerLastName, CustomerSalutation, MovieInfo, Order, OrderId } from "@/Domain/Ticketing/Orders/mod.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 import { Seat, VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
@@ -21,6 +22,7 @@ const mockLogger: Logger = {
 function createTestOrder(orderId: string): Order {
   const movieInfo = MovieInfo.create(
     MovieId.create(crypto.randomUUID()),
+    "external-id",
     MovieTitle.create("Test Movie"),
     MovieDuration.create(120),
     [Genre.create("Drama")],

@@ -19,6 +19,7 @@ const mockLogger: Logger = {
 function createOrder(): Order {
   const mi = MovieInfo.create(
     MovieId.create(crypto.randomUUID()),
+    "external-id",
     MovieTitle.create("Test Movie"),
     MovieDuration.create(90),
     [Genre.create("Drama")],

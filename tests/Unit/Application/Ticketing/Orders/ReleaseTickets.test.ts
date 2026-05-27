@@ -21,6 +21,7 @@ const mockLogger: Logger = {
 function createOrder(withCustomer = true): Order {
   const movieInfo = MovieInfo.create(
     MovieId.create(crypto.randomUUID()),
+    "external-id",
     MovieTitle.create("Test Movie"),
     MovieDuration.create(120),
     [Genre.create("Drama")],

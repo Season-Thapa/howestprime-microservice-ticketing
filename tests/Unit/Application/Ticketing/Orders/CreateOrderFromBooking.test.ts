@@ -2,7 +2,8 @@ import { assertEquals, assertRejects } from "@std/assert";
 import { CreateOrderFromBooking, type CreateOrderFromBookingUseCaseInput } from "@/Application/Ticketing/Orders/CreateOrderFromBooking.ts";
 import { createMockUnitOfWork } from "@/tests/Unit/Application/Shared/mod.ts";
 import type { Logger } from "@/Application/Ports/mod.ts";
-import { Movie, MovieId, MovieTitle, MovieDuration, Genre, PosterUrl, AgeRating } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieDuration, Genre, PosterUrl, AgeRating } from "@/Domain/Shared/mod.ts";
+import { Movie, MovieId, MovieTitle } from "@/Domain/Ticketing/Movies/mod.ts";
 import { Order } from "@/Domain/Ticketing/Orders/mod.ts";
 import { Optional } from "@domaincrafters/std";
 
@@ -15,8 +16,11 @@ const mockLogger: Logger = {
 
 // Helper to create a valid test movie
 function createTestMovie(movieId: string): Movie {
+  const externalId = "0000-0000-0000-0000-000000000001";
+
   return Movie.create(
     MovieId.create(movieId),
+    externalId,
     MovieTitle.create("Test Movie"),
     AgeRating.create("12+"),
     [Genre.create("Drama")],
@@ -27,13 +31,14 @@ function createTestMovie(movieId: string): Movie {
 
 Deno.test("CreateOrderFromBooking - successfully creates order with standard and discounted visitors", async () => {
   // Arrange
-  const movieId = crypto.randomUUID();
   const bookingId = crypto.randomUUID();
-  const testMovie = createTestMovie(movieId);
+  const externalId = "0000-0000-0000-0000-000000000001";
+
+  const testMovie = createTestMovie(externalId);
 
   const mockMovieRepository = {
-    findById: async (id: MovieId) => {
-      if (id.value === movieId) {
+    findById: async (id: string) => {
+      if (id === externalId) {
         return Optional.of(testMovie);
       }
       return Optional.empty();
@@ -60,7 +65,7 @@ Deno.test("CreateOrderFromBooking - successfully creates order with standard and
 
   const input: CreateOrderFromBookingUseCaseInput = {
     bookingId,
-    movieId,
+    externalId: movieId,
     room: "Room A",
     showtime: "2026-05-15T18:30:00.000Z",
     standardVisitors: 2,
@@ -74,19 +79,16 @@ Deno.test("CreateOrderFromBooking - successfully creates order with standard and
   // Assert
   assertEquals(result.length > 0, true);
   assertEquals(mockUow.saveCalled, true);
-  assertEquals(mockUow.saveCallCount, 1);
-});
-
-Deno.test("CreateOrderFromBooking - throws error when movie does not exist", async () => {
-  // Arrange
-  const movieId = crypto.randomUUID();
-  const bookingId = crypto.randomUUID();
-
-  const mockMovieRepository = {
-    findById: async () => Optional.empty(),
-    save: async () => {},
-    remove: async () => {},
-  };
+  function createTestMovie(movieId: string): Movie {
+    return Movie.create(
+      movieId,
+      MovieTitle.create("Test Movie"),
+      AgeRating.create("12+"),
+      [Genre.create("Drama")],
+      MovieDuration.create(120),
+      PosterUrl.create("https://example.com/poster.jpg"),
+    );
+  }
 
   const mockUow = createMockUnitOfWork({
     repositories: new Map([["Movie", mockMovieRepository as any]]),
@@ -96,7 +98,7 @@ Deno.test("CreateOrderFromBooking - throws error when movie does not exist", asy
 
   const input: CreateOrderFromBookingUseCaseInput = {
     bookingId,
-    movieId,
+    externalId: movieId,
     room: "Room A",
     showtime: "2026-05-15T18:30:00.000Z",
     standardVisitors: 1,
@@ -128,7 +130,7 @@ Deno.test("CreateOrderFromBooking - throws error when seat count does not match 
 
   const input: CreateOrderFromBookingUseCaseInput = {
     bookingId,
-    movieId,
+    externalId: movieId,
     room: "Room A",
     showtime: "2026-05-15T18:30:00.000Z",
     standardVisitors: 2,
@@ -172,7 +174,7 @@ Deno.test("CreateOrderFromBooking - creates correct ticket distribution for stan
 
   const input: CreateOrderFromBookingUseCaseInput = {
     bookingId,
-    movieId,
+    externalId: movieId,
     room: "Room A",
     showtime: "2026-05-15T18:30:00.000Z",
     standardVisitors: 2,

@@ -11,7 +11,7 @@ export interface CreateOrderFromBookingUseCaseInput {
     room: string;
     showtime: string;
     standardVisitors: number;
-    discountVisitors: number;
+    discountedVisitors: number;
     seatNumbers: number[];
 }
 export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUseCaseInput, string> {
@@ -24,7 +24,7 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
     }
     async execute(input: CreateOrderFromBookingUseCaseInput): Promise<string> {
         this._logger.debug('Creating Order from booking', { input });
-        const totalVisitors = input.standardVisitors + input.discountVisitors;
+        const totalVisitors = input.standardVisitors + input.discountedVisitors;
         if (input.seatNumbers.length !== totalVisitors) {
             throw new Error(
                 `Mismatch: Provided ${input.seatNumbers.length} seats for ${totalVisitors} visitors.`,
@@ -32,20 +32,20 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
         }
         const result = await this._unitOfWork.do<string>(async () => {
             const movieRepository = this._unitOfWork.getRepository<MovieRepository>('Movie');
-            const externalId =input.externalId;
-            const movieOptional = await movieRepository.findByExternalMovieId(externalId);
+            const movieOptional = await movieRepository.findByExternalMovieId(input.externalId);
 
             if (!movieOptional.isPresent) {
                 throw new Error(
-                    `Movie with ID ${input.externalId} not found. Ensure MovieRegistered event was processed.`,
+                    `Movie with external ID ${input.externalId} not found. Ensure MovieRegistered event was processed.`,
                 );
             }
 
             const movie = movieOptional.getOrThrow(
-                `Movie with ID ${input.externalId} should be present.`,
+                `Movie with external ID ${input.externalId} should be present.`,
             );
 
             const movieInfo = MovieInfo.create(
+                movie.id,
                 movie.externalId,
                 movie.title,
                 movie.duration,
@@ -66,12 +66,14 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
                 const ticket = Ticket.create(movieInfo, seat, input.room, showtimeDate);
                 tickets.push(ticket);
             }
-            const bookingId: BookingId = BookingId.create(input.bookingId);
+            var bookingId: BookingId = BookingId.create(input.bookingId);
 
             const order = Order.create(bookingId, tickets);
 
             this._logger.info('Created Order from booking', { order });
             await this._unitOfWork.save(order);
+            this._logger.info('Order value:', { orderId: order.id.value });
+            this._logger.info('Order string', { orderId: order.id.toString() });
 
             return order.id.value;
         });

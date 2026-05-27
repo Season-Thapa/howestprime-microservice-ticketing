@@ -3,7 +3,6 @@ import { Optional } from '@domaincrafters/std';
 import type { Document, Filter } from '@mongodb';
 import { Movie } from '@/Domain/Ticketing/Movies/mod.ts';
 import type { MovieId } from '@/Domain/Ticketing/Movies/mod.ts';
-import type { ExternalMovieId } from '@/Domain/Shared/mod.ts';
 import {
     MongoDbClient,
     MongoDbRepository,
@@ -35,11 +34,11 @@ export class MongoDbMovieRepository extends MongoDbRepository<Movie, MovieId>
         );
     }
     async findByExternalMovieId(
-        id: ExternalMovieId,
+        externalId: string,
     ): Promise<Optional<Movie>> {
 
         const filter: Filter<Document> = {
-            externalMovieId: id.value,
+            externalId: externalId,
         };
 
         const document = await this._dbClient.findDocument(

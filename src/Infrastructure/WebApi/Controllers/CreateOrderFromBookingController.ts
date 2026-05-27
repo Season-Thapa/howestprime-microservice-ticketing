@@ -23,7 +23,7 @@ export class CreateOrderFromBookingController implements WebApiController {
             room: payload.room,
             showtime: payload.showtime,
             standardVisitors: payload.standardVisitors,
-            discountVisitors: payload.discountVisitors,
+            discountedVisitors: payload.discountVisitors,
             seatNumbers: payload.seatNumbers,
         });
 
@@ -32,11 +32,10 @@ export class CreateOrderFromBookingController implements WebApiController {
 
             // ✅ normalization happens here
             externalId: payload.movieId as string,
-
             room: payload.room as string,
             showtime: payload.showtime as string,
             standardVisitors: Number(payload.standardVisitors),
-            discountVisitors: Number(payload.discountVisitors),
+            discountedVisitors: Number(payload.discountVisitors),
             seatNumbers: payload.seatNumbers as number[],
         });
 

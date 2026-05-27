@@ -3,20 +3,18 @@ import type { Document } from '@mongodb';
 import {
     AgeRating,
     Genre,
-    Movie,
     MovieDuration,
-    MovieId,
     MovieTitle,
     PosterUrl,
-} from '@/Domain/Ticketing/Movies/mod.ts';
-import { ExternalMovieId } from '@/Domain/Shared/mod.ts';
+} from '@/Domain/Shared/mod.ts';
+import { Movie, MovieId } from '@/Domain/Ticketing/Movies/mod.ts';
 import { Money } from '@/Domain/Shared/ValueObjects/Money.ts';
 import { type DocumentMapper } from '@/Infrastructure/Persistence/MongoDb/Shared/mod.ts';
 
 interface MovieDocumentShape {
     _id?: string;
     id?: string;
-    externalMovieId: string;
+    externalId: string;
     title: string;
     duration: number;
     genres: string[];
@@ -29,7 +27,7 @@ export class MovieDocumentMapper implements DocumentMapper<Movie> {
     toDocument(aggregate: Movie): Document {
         return {
             _id: aggregate.id.value,
-            externalMovieId: aggregate.externalMovieId.value,
+            externalId: aggregate.externalId,
             title: aggregate.title.value,
             duration: aggregate.duration.duration,
             genres: aggregate.genres.map((g) => g.value),
@@ -44,7 +42,7 @@ export class MovieDocumentMapper implements DocumentMapper<Movie> {
 
         const movie = Object.create(Movie.prototype) as {
             _id: MovieId;
-            _externalMovieId: ExternalMovieId;
+            _externalId: string;
             _title: MovieTitle;
             _ageRating: AgeRating;
             _genres: Genre[];
@@ -55,7 +53,7 @@ export class MovieDocumentMapper implements DocumentMapper<Movie> {
         };
 
         movie._id = MovieId.create((snapshot._id ?? snapshot.id) as string);
-        movie._externalMovieId = ExternalMovieId.create(snapshot.externalMovieId as string);
+        movie._externalId = snapshot.externalId;
         movie._title = MovieTitle.create(snapshot.title);
         movie._ageRating = AgeRating.create(snapshot.ageRating);
         movie._genres = snapshot.genres.map((g) => Genre.create(g));

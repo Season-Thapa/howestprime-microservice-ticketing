@@ -25,10 +25,11 @@ import {
     AgeRating,
     Genre,
     MovieDuration,
-    MovieId,
     MovieTitle,
     PosterUrl,
-} from '@/Domain/Ticketing/Movies/mod.ts';
+} from '@/Domain/Shared/mod.ts'
+import {  MovieId } from '@/Domain/Ticketing/Movies/mod.ts';
+
 
 interface CustomerDocumentShape {
     id: string;
@@ -42,6 +43,7 @@ interface TicketDocumentShape {
     id: string;
     movieInfo: {
         id: string;
+        externalId: string;
         title: string;
         duration: number;
         genres: string[];
@@ -85,6 +87,7 @@ export class OrderDocumentMapper implements DocumentMapper<Order> {
                 id: ticket.id.value,
                 movieInfo: {
                     id: ticket.movieInfo.id.value,
+                    externalId:ticket.movieInfo.externalId,
                     title: ticket.movieInfo.title.value,
                     duration: ticket.movieInfo.duration.duration,
                     genres: ticket.movieInfo.genres.map((genre) => genre.value),
@@ -147,6 +150,7 @@ export class OrderDocumentMapper implements DocumentMapper<Order> {
         order._tickets = snapshot.tickets.map((ticketSnapshot) => {
             const movieInfo = MovieInfo.create(
                 MovieId.create(ticketSnapshot.movieInfo.id),
+                ticketSnapshot.movieInfo.externalId,
                 MovieTitle.create(ticketSnapshot.movieInfo.title),
                 MovieDuration.create(ticketSnapshot.movieInfo.duration),
                 ticketSnapshot.movieInfo.genres.map((genre) => Genre.create(genre)),

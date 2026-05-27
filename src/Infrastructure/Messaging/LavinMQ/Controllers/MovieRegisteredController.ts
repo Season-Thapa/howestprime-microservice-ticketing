@@ -33,7 +33,7 @@ export class MovieRegisteredController implements AmqpController<MovieRegistered
             : payload;
 
         return {
-            movieId: this.requireNonEmptyString(body.movieId, 'movieId'),
+            externalId: this.requireNonEmptyString(body.movieId, 'movieId'),
             title: this.requireNonEmptyString(body.title, 'title'),
             duration: this.requireNumber(
                 (body.duration as any)?.value ?? body.duration,

@@ -1,12 +1,14 @@
 import type { Logger, UnitOfWork, UseCase } from '@/Application/Ports/mod.ts';
 import {
+    Movie
+} from '@/Domain/Ticketing/Movies/mod.ts';
+import {
     AgeRating,
     Genre,
-    Movie,
     MovieDuration,
     MovieTitle,
     PosterUrl,
-} from '@/Domain/Ticketing/Movies/mod.ts';
+} from '@/Domain/Shared/mod.ts';
 
 export interface SaveMovieInput {
     externalId: string;

@@ -36,7 +36,7 @@ export class CreateOrderFromBookingController
 
         return {
             bookingId: request.bookingId,
-            movieId: request.movieId,
+            externalId: request.movieId,
             room: request.room,
             showtime: request.showtime,
             standardVisitors: request.standardVisitors,

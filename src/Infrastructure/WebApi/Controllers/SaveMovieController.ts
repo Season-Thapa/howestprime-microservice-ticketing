@@ -15,7 +15,7 @@ export class SaveMovieController implements WebApiController {
             ctx.throw(400, 'Invalid input for movie registration');
         }
         this._logger.info('Received request to save movie', {
-            movieId: body.movieId,
+            externalId: body.movieId,
             title: body.title,
             duration: body.duration,
             ageRating: body.ageRating,
@@ -23,7 +23,7 @@ export class SaveMovieController implements WebApiController {
             posterUrl: body.posterUrl,
         });
         const id: string = await this._useCase.execute({
-            movieId: body.movieId,
+            externalId: body.movieId,
             title: body.title,
             duration: body.duration,
             ageRating: body.ageRating,

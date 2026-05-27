@@ -1,13 +1,15 @@
-import { ValueObject, ExternalMovieId } from '@/Domain/Shared/mod.ts';
-import { MovieTitle } from '../../Movies/ValueObjects/MovieTitle.ts';
-import { MovieDuration } from '../../Movies/ValueObjects/MovieDuration.ts';
-import { Genre } from '../../Movies/ValueObjects/Genre.ts';
-import { PosterUrl } from '../../Movies/ValueObjects/PosterUrl.ts';
-import { AgeRating } from '../../Movies/ValueObjects/AgeRating.ts';
+import { ValueObject } from '@/Domain/Shared/mod.ts';
+import { MovieId } from '../../Movies/Movie.ts';
+import { MovieTitle } from '../../../Shared/ValueObjects/MovieTitle.ts';
+import { MovieDuration } from '../../../Shared/ValueObjects/MovieDuration.ts';
+import { Genre } from '../../../Shared/ValueObjects/Genre.ts';
+import { PosterUrl } from '../../../Shared/ValueObjects/PosterUrl.ts';
+import { AgeRating } from '../../../Shared/ValueObjects/AgeRating.ts';
 import { Money } from '../../../Shared/ValueObjects/Money.ts';
 
 export class MovieInfo extends ValueObject {
-    private readonly _id: string;
+    private readonly _id: MovieId;
+    private readonly _externalId : string;
     private readonly _title: MovieTitle;
     private readonly _duration: MovieDuration;
     private readonly _genres: Genre[];
@@ -16,7 +18,8 @@ export class MovieInfo extends ValueObject {
     private readonly _price: Money;
 
     private constructor(
-        id: string,
+        id: MovieId,
+        externalId: string,
         title: MovieTitle,
         duration: MovieDuration,
         genres: Genre[],
@@ -26,6 +29,7 @@ export class MovieInfo extends ValueObject {
     ) {
         super();
         this._id = id;
+        this._externalId = externalId
         this._title = title;
         this._duration = duration;
         this._genres = genres;
@@ -35,7 +39,8 @@ export class MovieInfo extends ValueObject {
     }
 
     public static create(
-        id: ExternalMovieId,
+        id: MovieId,
+        externalId: string,
         title: MovieTitle,
         duration: MovieDuration,
         genres: Genre[],
@@ -43,11 +48,14 @@ export class MovieInfo extends ValueObject {
         ageRating: AgeRating,
         price: Money,
     ): MovieInfo {
-        return new MovieInfo(id, title, duration, genres, posterUrl, ageRating, price);
+        return new MovieInfo(id,externalId, title, duration, genres, posterUrl, ageRating, price);
     }
 
-    get id(): ExternalMovieId {
+    get id(): MovieId {
         return this._id;
+    }
+    get externalId(): string {
+        return this._externalId;
     }
 
     get title(): MovieTitle {

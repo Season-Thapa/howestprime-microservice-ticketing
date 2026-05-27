@@ -14,24 +14,21 @@ export interface CreateOrderFromBookingRequest {
 }
 export class CreateOrderFromBookingController
     implements AmqpController<CreateOrderFromBookingRequest> {
-    private readonly _createOrderFromBookingUseCase: CreateOrderFromBookingUseCaseInput;
     constructor(
-         createOrderFromBookingUseCase: UseCase<
+        private readonly createOrderFromBookingUseCase: UseCase<
             CreateOrderFromBookingUseCaseInput,
             string
         >,
     ) {
-        this._createOrderFromBookingUseCase = createOrderFromBookingUseCase;
     }
 
     async handle(request: CreateOrderFromBookingRequest): Promise<void> {
-        console.log('=== INCOMING AMQP MESSAGE START ===');
-        console.log(JSON.stringify(request, null, 2));
-        console.log('=== INCOMING AMQP MESSAGE END ===');
         const input: CreateOrderFromBookingUseCaseInput = this.validateInput(request);
-        await this._createOrderFromBookingUseCase.execute(input);
+        await this.createOrderFromBookingUseCase.execute(input);
     }
-    private validateInput(request: CreateOrderFromBookingRequest): CreateOrderFromBookingUseCaseInput {
+    private validateInput(
+        request: CreateOrderFromBookingRequest,
+    ): CreateOrderFromBookingUseCaseInput {
         Guard.check(request.bookingId).againstWhitespace();
         Guard.check(request.movieId).againstWhitespace();
         Guard.check(request.room).againstWhitespace();
@@ -47,5 +44,4 @@ export class CreateOrderFromBookingController
             seatNumbers: request.seatNumbers.map(Number),
         };
     }
-
 }

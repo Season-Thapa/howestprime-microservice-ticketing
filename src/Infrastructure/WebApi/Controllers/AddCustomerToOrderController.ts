@@ -11,7 +11,6 @@ export class AddCustomerToOrderController implements WebApiController {
         this._logger = logger;
     }
     async handle(ctx: RouterContext<string>): Promise<void> {
-
         const orderId = ctx.params.orderId;
 
         if (!orderId || orderId === 'undefined') {

@@ -16,9 +16,6 @@ export class MovieRegisteredController implements AmqpController<MovieRegistered
     constructor(private readonly _saveMovieUseCase: UseCase<SaveMovieInput, string>) {}
 
     async handle(request: MovieRegisteredRequest): Promise<void> {
-        console.log('=== INCOMING AMQP MESSAGE START ===');
-        console.log(JSON.stringify(request, null, 2));
-        console.log('=== INCOMING AMQP MESSAGE END ===');
         const input = this.extractInput(request as unknown);
         await this._saveMovieUseCase.execute(input);
     }
@@ -38,8 +35,11 @@ export class MovieRegisteredController implements AmqpController<MovieRegistered
         return {
             movieId: this.requireNonEmptyString(body.movieId, 'movieId'),
             title: this.requireNonEmptyString(body.title, 'title'),
-            duration: this.requireNumber((body.duration as any)?.value ?? body.duration, 'duration'),
-            ageRating: this.requireNumber((body.ageRating as any)?.value ?? body.ageRating, 'ageRating'),
+            duration: this.requireNumber(
+                (body.duration as any)?.value ?? body.duration,
+                'duration',
+            ),
+            ageRating: this.requireNonEmptyString(body.ageRating, 'ageRating'),
             genres: this.requireStringArray(body.genres, 'genres'),
             posterUrl: this.requireNonEmptyString(body.posterUrl, 'posterUrl'),
         };

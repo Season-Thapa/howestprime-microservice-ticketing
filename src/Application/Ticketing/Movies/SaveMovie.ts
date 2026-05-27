@@ -4,13 +4,12 @@ import {
     Genre,
     Movie,
     MovieDuration,
-    MovieId,
     MovieTitle,
     PosterUrl,
 } from '@/Domain/Ticketing/Movies/mod.ts';
 
 export interface SaveMovieInput {
-    movieId: string;
+    externalId: string;
     title: string;
     duration: number;
     ageRating: string;
@@ -32,7 +31,7 @@ export class SaveMovie implements UseCase<SaveMovieInput, string> {
         this._logger.debug('Saving movie', { input });
         const result = await this._unitOfWork.do<string>(async () => {
             const movie = Movie.create(
-                MovieId.create(input.movieId),
+                input.externalId,
                 MovieTitle.create(input.title),
                 AgeRating.create(input.ageRating),
                 input.genres.map((genre) => Genre.create(genre)),

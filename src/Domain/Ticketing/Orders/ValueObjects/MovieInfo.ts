@@ -7,7 +7,7 @@ import { AgeRating } from '../../Movies/ValueObjects/AgeRating.ts';
 import { Money } from '../../../Shared/ValueObjects/Money.ts';
 
 export class MovieInfo extends ValueObject {
-    private readonly _id: ExternalMovieId;
+    private readonly _id: string;
     private readonly _title: MovieTitle;
     private readonly _duration: MovieDuration;
     private readonly _genres: Genre[];
@@ -16,7 +16,7 @@ export class MovieInfo extends ValueObject {
     private readonly _price: Money;
 
     private constructor(
-        id: ExternalMovieId,
+        id: string,
         title: MovieTitle,
         duration: MovieDuration,
         genres: Genre[],

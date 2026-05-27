@@ -18,7 +18,7 @@ export class AgeRating extends ValueObject {
     }
 
     protected validate(): void {
-        if(!this._value ) {
+        if (!this._value) {
             throw new InvalidAgeRatingException(this._value);
         }
     }

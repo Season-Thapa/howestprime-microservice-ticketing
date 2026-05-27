@@ -1,4 +1,4 @@
-import type { MovieRepository } from '@/Domain/Ticketing/Movies/mod.ts';
+ import type { MovieRepository } from '@/Domain/Ticketing/Movies/mod.ts';
 import { Optional } from '@domaincrafters/std';
 import type { Document, Filter } from '@mongodb';
 import { Movie } from '@/Domain/Ticketing/Movies/mod.ts';

@@ -2,13 +2,12 @@ import type { Logger, UnitOfWork, UseCase } from '@/Application/Ports/mod.ts';
 import type { MovieRepository } from '@/Domain/Ticketing/Movies/mod.ts';
 
 import { BookingId, MovieInfo, Order } from '@/Domain/Ticketing/Orders/mod.ts';
-import { ExternalMovieId } from '../../../Domain/Shared/ValueObjects/ExternalMovieId.ts';
 import { Seat, VisitorType } from '@/Domain/Ticketing/Orders/ValueObjects/Seat.ts';
 import { Ticket } from '@/Domain/Ticketing/Orders/Entities/Ticket.ts';
 
 export interface CreateOrderFromBookingUseCaseInput {
     bookingId: string;
-    externalMovieId: string;
+    externalId: string;
     room: string;
     showtime: string;
     standardVisitors: number;
@@ -33,21 +32,21 @@ export class CreateOrderFromBooking implements UseCase<CreateOrderFromBookingUse
         }
         const result = await this._unitOfWork.do<string>(async () => {
             const movieRepository = this._unitOfWork.getRepository<MovieRepository>('Movie');
-            const externalMovieId = ExternalMovieId.create(input.externalMovieId);
-            const movieOptional = await movieRepository.findByExternalMovieId(externalMovieId);
+            const externalId =input.externalId;
+            const movieOptional = await movieRepository.findByExternalMovieId(externalId);
 
             if (!movieOptional.isPresent) {
                 throw new Error(
-                    `Movie with ID ${input.externalMovieId} not found. Ensure MovieRegistered event was processed.`,
+                    `Movie with ID ${input.externalId} not found. Ensure MovieRegistered event was processed.`,
                 );
             }
 
             const movie = movieOptional.getOrThrow(
-                `Movie with ID ${input.externalMovieId} should be present.`,
+                `Movie with ID ${input.externalId} should be present.`,
             );
 
             const movieInfo = MovieInfo.create(
-                movie.externalMovieId,
+                movie.externalId,
                 movie.title,
                 movie.duration,
                 movie.genres,

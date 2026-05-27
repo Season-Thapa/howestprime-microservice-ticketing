@@ -19,7 +19,7 @@ export class CreateOrderFromBookingController implements WebApiController {
 
         this._logger.info('Received request to create order from booking', {
             bookingId: payload.bookingId,
-            movieId: payload.movieId,
+            externalId: payload.movieId,
             room: payload.room,
             showtime: payload.showtime,
             standardVisitors: payload.standardVisitors,
@@ -31,7 +31,7 @@ export class CreateOrderFromBookingController implements WebApiController {
             bookingId: payload.bookingId as string,
 
             // ✅ normalization happens here
-            externalMovieId: payload.movieId as string,
+            externalId: payload.movieId as string,
 
             room: payload.room as string,
             showtime: payload.showtime as string,

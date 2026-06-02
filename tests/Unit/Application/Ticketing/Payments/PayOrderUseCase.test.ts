@@ -4,7 +4,8 @@ import { PayOrderUseCase, type PayOrderInput } from "@/Application/Ticketing/Pay
 import { createMockDomainEventBus, createMockOnlinePaymentService, createMockUnitOfWork } from "@/tests/Unit/Application/Shared/mod.ts";
 import { BookingId, Order, OrderId, MovieInfo } from "@/Domain/Ticketing/Orders/mod.ts";
 import { MovieDuration, Genre, PosterUrl, AgeRating } from "@/Domain/Shared/mod.ts";
-import { MovieId, MovieTitle } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieId } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieTitle } from "@/Domain/Shared/mod.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 import { Seat, VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
 import { Money } from "@/Domain/Shared/mod.ts";
@@ -35,6 +36,7 @@ function createInput(overrides: Partial<PayOrderInput> = {}): PayOrderInput {
 function createTestOrder(orderId: string, bookingId: string): Order {
   const movieInfo = MovieInfo.create(
     MovieId.create(crypto.randomUUID()),
+    crypto.randomUUID(),
     MovieTitle.create("Test Movie"),
     MovieDuration.create(120),
     [Genre.create("Drama")],

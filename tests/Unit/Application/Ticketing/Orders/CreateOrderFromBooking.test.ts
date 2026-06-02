@@ -3,7 +3,8 @@ import { CreateOrderFromBooking, type CreateOrderFromBookingUseCaseInput } from 
 import { createMockUnitOfWork } from "@/tests/Unit/Application/Shared/mod.ts";
 import type { Logger } from "@/Application/Ports/mod.ts";
 import { MovieDuration, Genre, PosterUrl, AgeRating } from "@/Domain/Shared/mod.ts";
-import { Movie, MovieId, MovieTitle } from "@/Domain/Ticketing/Movies/mod.ts";
+import { Movie } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieTitle } from "@/Domain/Shared/mod.ts";
 import { Order } from "@/Domain/Ticketing/Orders/mod.ts";
 import { Optional } from "@domaincrafters/std";
 
@@ -15,11 +16,8 @@ const mockLogger: Logger = {
 };
 
 // Helper to create a valid test movie
-function createTestMovie(movieId: string): Movie {
-  const externalId = "0000-0000-0000-0000-000000000001";
-
+function createTestMovie(externalId: string): Movie {
   return Movie.create(
-    MovieId.create(movieId),
     externalId,
     MovieTitle.create("Test Movie"),
     AgeRating.create("12+"),
@@ -38,6 +36,12 @@ Deno.test("CreateOrderFromBooking - successfully creates order with standard and
 
   const mockMovieRepository = {
     findById: async (id: string) => {
+      if (id === externalId) {
+        return Optional.of(testMovie);
+      }
+      return Optional.empty();
+    },
+    findByExternalMovieId: async (id: string) => {
       if (id === externalId) {
         return Optional.of(testMovie);
       }
@@ -65,7 +69,7 @@ Deno.test("CreateOrderFromBooking - successfully creates order with standard and
 
   const input: CreateOrderFromBookingUseCaseInput = {
     bookingId,
-    externalId: movieId,
+    externalId: externalId,
     room: "Room A",
     showtime: "2026-05-15T18:30:00.000Z",
     standardVisitors: 2,
@@ -79,35 +83,6 @@ Deno.test("CreateOrderFromBooking - successfully creates order with standard and
   // Assert
   assertEquals(result.length > 0, true);
   assertEquals(mockUow.saveCalled, true);
-  function createTestMovie(movieId: string): Movie {
-    return Movie.create(
-      movieId,
-      MovieTitle.create("Test Movie"),
-      AgeRating.create("12+"),
-      [Genre.create("Drama")],
-      MovieDuration.create(120),
-      PosterUrl.create("https://example.com/poster.jpg"),
-    );
-  }
-
-  const mockUow = createMockUnitOfWork({
-    repositories: new Map([["Movie", mockMovieRepository as any]]),
-  });
-
-  const useCase = new CreateOrderFromBooking(mockUow, mockLogger);
-
-  const input: CreateOrderFromBookingUseCaseInput = {
-    bookingId,
-    externalId: movieId,
-    room: "Room A",
-    showtime: "2026-05-15T18:30:00.000Z",
-    standardVisitors: 1,
-    discountedVisitors: 0,
-    seatNumbers: [12],
-  };
-
-  // Act & Assert
-  await assertRejects(async () => await useCase.execute(input), Error, `Movie with ID ${movieId} not found`);
 });
 
 Deno.test("CreateOrderFromBooking - throws error when seat count does not match visitor count", async () => {
@@ -118,6 +93,7 @@ Deno.test("CreateOrderFromBooking - throws error when seat count does not match 
 
   const mockMovieRepository = {
     findById: async () => Optional.of(testMovie),
+    findByExternalMovieId: async () => Optional.of(testMovie),
     save: async () => {},
     remove: async () => {},
   };
@@ -151,6 +127,7 @@ Deno.test("CreateOrderFromBooking - creates correct ticket distribution for stan
 
   const mockMovieRepository = {
     findById: async () => Optional.of(testMovie),
+    findByExternalMovieId: async () => Optional.of(testMovie),
     save: async () => {},
     remove: async () => {},
   };
@@ -206,6 +183,7 @@ Deno.test("CreateOrderFromBooking - correctly calculates total price", async () 
 
   const mockMovieRepository = {
     findById: async () => Optional.of(testMovie),
+    findByExternalMovieId: async () => Optional.of(testMovie),
     save: async () => {},
     remove: async () => {},
   };
@@ -229,7 +207,7 @@ Deno.test("CreateOrderFromBooking - correctly calculates total price", async () 
 
   const input: CreateOrderFromBookingUseCaseInput = {
     bookingId,
-    movieId,
+    externalId: movieId,
     room: "Room A",
     showtime: "2026-05-15T18:30:00.000Z",
     standardVisitors: 2,

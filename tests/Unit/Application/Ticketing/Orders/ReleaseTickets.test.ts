@@ -4,7 +4,8 @@ import { ReleaseTickets } from "@/Application/Ticketing/Orders/ReleaseTicket.ts"
 import { createMockDomainEventBus, createMockUnitOfWork } from "@/tests/Unit/Application/Shared/mod.ts";
 import { Order, BookingId, MovieInfo, OrderStatus, OrderStatusState } from "@/Domain/Ticketing/Orders/mod.ts";
 import { TicketReleased } from "@/Domain/Ticketing/Orders/Events/TicketReleased.ts";
-import { MovieId, MovieTitle, MovieDuration, Genre, PosterUrl, AgeRating } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieId, MovieTitle } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieDuration, Genre, PosterUrl, AgeRating } from "@/Domain/Shared/mod.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 import { Seat, VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
 import { Money, Email } from "@/Domain/Shared/mod.ts";

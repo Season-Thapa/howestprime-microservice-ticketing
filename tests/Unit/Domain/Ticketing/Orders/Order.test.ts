@@ -2,7 +2,8 @@ import { assertEquals, assertThrows } from "@std/assert";
 import { BookingId, Customer, CustomerFirstName, CustomerLastName, CustomerSalutation, MovieInfo, Order } from "@/Domain/Ticketing/Orders/mod.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 import { Seat, VisitorType } from "@/Domain/Ticketing/Orders/ValueObjects/Seat.ts";
-import { MovieId, MovieTitle, AgeRating, Genre, MovieDuration, PosterUrl } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieId } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieTitle, AgeRating, Genre, MovieDuration, PosterUrl } from "@/Domain/Shared/mod.ts";
 import { Money } from "@/Domain/Shared/ValueObjects/Money.ts";
 import { Email } from "@/Domain/Shared/mod.ts";
 
@@ -10,6 +11,7 @@ import { Email } from "@/Domain/Shared/mod.ts";
 function createValidMovieInfo(): MovieInfo {
   return MovieInfo.create(
     MovieId.create(crypto.randomUUID()),
+    crypto.randomUUID(),
     MovieTitle.create("Test Movie"),
     MovieDuration.create(120),
     [Genre.create("Drama")],

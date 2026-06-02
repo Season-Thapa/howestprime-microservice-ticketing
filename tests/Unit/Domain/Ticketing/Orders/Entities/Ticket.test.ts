@@ -1,6 +1,7 @@
 import { assertEquals, assertThrows } from "@std/assert";
 
-import { AgeRating, Genre, MovieDuration, MovieId, MovieTitle, PosterUrl } from "@/Domain/Ticketing/Movies/mod.ts";
+import { MovieId } from "@/Domain/Ticketing/Movies/mod.ts";
+import { AgeRating, Genre, MovieDuration, MovieTitle, PosterUrl } from "@/Domain/Shared/mod.ts";
 import { Money } from "@/Domain/Shared/mod.ts";
 import { MovieInfo, Seat, VisitorType } from "@/Domain/Ticketing/Orders/mod.ts";
 import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
@@ -8,6 +9,7 @@ import { Ticket } from "@/Domain/Ticketing/Orders/Entities/Ticket.ts";
 function createMovieInfo(): MovieInfo {
   return MovieInfo.create(
     MovieId.create(crypto.randomUUID()),
+    crypto.randomUUID(),
     MovieTitle.create("The Great Booking"),
     MovieDuration.create(120),
     [Genre.create("Drama")],

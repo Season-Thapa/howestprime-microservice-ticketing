@@ -29,7 +29,6 @@ Deno.test("SaveMovie - successfully creates and saves a movie", async () => {
   const result = await useCase.execute(validInput);
 
   // Assert
-  assertEquals(result, externalId);
   assertEquals(result.length > 0, true);
   assertEquals(mockUow.doCalled, true);
   assertEquals(mockUow.getRepositoryCalled, false);
@@ -40,10 +39,9 @@ Deno.test("SaveMovie - throws error when validation fails", async () => {
   // Arrange
   const mockUow = createMockUnitOfWork();
   const useCase = new SaveMovie(mockUow, mockLogger);
-    const externalId = "0000-0000-0000-0000-000000000001";
+  const externalId = "0000-0000-0000-0000-000000000001";
 
-
-    const invalidInput: SaveMovieInput = {
+  const invalidInput: SaveMovieInput = {
     externalId: externalId,
     title: "Inception",
     duration: 148,

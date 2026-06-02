@@ -18,3 +18,17 @@ Deno.test("MovieDuration - throws error when duration is 0 or negative", () => {
   );
   assertThrows(() => MovieDuration.create(-15), InvalidMovieDurationException);
 });
+
+Deno.test("MovieDuration - totalDuration matches duration", () => {
+  const d1 = MovieDuration.create(90);
+  const d2 = MovieDuration.create(90);
+  const d3 = MovieDuration.create(120);
+
+  assertEquals(d1.totalDuration, d1.duration);
+  assertEquals(d3.totalDuration, d3.duration);
+
+  // equals
+  assertEquals(d1.equals(d2), true);
+  assertEquals(d1.equals(d3), false);
+
+});

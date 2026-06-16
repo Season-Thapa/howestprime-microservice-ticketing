@@ -49,7 +49,7 @@ export enum MongoErrorCode {
  */
 export class MongoDbUnitOfWork implements UnitOfWork {
     private readonly _session: ClientSession;
-    private readonly _transactionOptions: TransactionOptions;
+    //private readonly _transactionOptions: TransactionOptions;
     private readonly _repositories: Map<string, Repository<AggregateRoot<EntityId>, EntityId>> =
         new Map();
     private readonly _retryConfig: RetryConfig;
@@ -58,11 +58,11 @@ export class MongoDbUnitOfWork implements UnitOfWork {
 
     constructor(
         session: ClientSession,
-        transactionOptions: TransactionOptions = DEFAULT_TRANSACTION_OPTIONS,
+        //transactionOptions: TransactionOptions = DEFAULT_TRANSACTION_OPTIONS,
         retryConfig: RetryConfig = DEFAULT_RETRY_CONFIG,
     ) {
         this._session = session;
-        this._transactionOptions = transactionOptions;
+        //this._transactionOptions = transactionOptions;
         this._retryConfig = retryConfig;
     }
 
@@ -137,13 +137,13 @@ export class MongoDbUnitOfWork implements UnitOfWork {
 
             try {
                 // Start transaction
-               // this._session.startTransaction(this._transactionOptions);
+                // this._session.startTransaction(this._transactionOptions);
 
                 // Execute the business logic
                 const result = await action();
 
                 // Commit transaction - this may fail with WriteConflict
-               // await this._session.commitTransaction();
+                // await this._session.commitTransaction();
 
                 // Only execute post-transaction hooks after successful commit
                 // Interceptors may need access to tracked entities (e.g., for domain events)

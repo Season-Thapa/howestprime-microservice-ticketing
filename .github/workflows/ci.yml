@@ -77,15 +77,16 @@ jobs:
       contents: read
       attestations: write
       id-token: write
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
 
-      - name: Login to registry ${{ vars.AZ_CONTAINER_REGISTRY}}
+      - name: Login to registry
         uses: azure/docker-login@v1
         with:
-          login-server: ${{ vars.AZ_CONTAINER_REGISTRY}}
-          username: ${{ vars.AZ_USERNAME}}
+          login-server: ${{ vars.AZ_CONTAINER_REGISTRY }}
+          username: ${{ vars.AZ_USERNAME }}
           password: ${{ secrets.AZ_PASSWORD}}
 
       - name: Build and push Docker image
@@ -99,63 +100,76 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Log in to Azure
-        run: az login --service-principal --username ${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL }} --password ${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL_PASSWORD }} --tenant ${{ vars.AZ_TENANT_ID }}
+        uses: azure/login@v1
+        with:
+          creds: '{ "clientId": "${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL }}", "clientSecret": "${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL_PASSWORD }}", "subscriptionId": "${{ vars.AZ_SUBSCRIPTION_ID }}", "tenantId": "${{ vars.AZ_TENANT_ID }}" }'
 
       - name: Deploy to Azure Container Apps
         run: |
+          set -e
+          
           EXISTS=$(az containerapp show \
           --name ${{ env.AZ_CONTAINER_NAME }} \
           --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
-          --query name -o tsv 2>/dev/null)
+          --query name -o tsv 2>/dev/null || true)
 
-         if [ -z "$EXISTS" ]; then
-           echo "Container app does not exist. Creating..."
+          if [ -z "$EXISTS" ]; then
+            echo "Container app Creating..."
+
+            az containerapp create \
+              --name ${{ env.AZ_CONTAINER_NAME }} \
+              --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
+              --environment ${{ vars.AZ_CONTAINER_ENVIRONMENT }} \
+              --image ${{ vars.AZ_CONTAINER_REGISTRY }}/${{ env.AZ_CONTAINER_NAME }}:${{ env.CONTAINER_VERSION_TAG }} \
+              --registry-server ${{ vars.AZ_CONTAINER_REGISTRY }} \
+              --registry-username ${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL }} \
+              --registry-password ${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL_PASSWORD }} \
+              --user-assigned "${{ vars.HOWESTPRIME_WIDE_MI_KEYVAULTREADER_URI }}" \
+              \
+              --secrets \
+                "db-password=keyvaultref:${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_PASSWORD_URI }},identityref:${{ vars.HOWESTPRIME_WIDE_MI_KEYVAULTREADER_URI }}" \
+                "mb-password=keyvaultref:${{ vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_PASSWORD_URI }},identityref:${{ vars.HOWESTPRIME_WIDE_MI_KEYVAULTREADER_URI }}" \
+              \
+              --env-vars \
+                "PERSISTENCE_MONGO_DB_PROTOCOL=${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_PROTOCOL }}" \
+                "PERSISTENCE_MONGO_DB_USER=${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_LOGIN }}" \
+                "PERSISTENCE_MONGO_DB_PORT=${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_PORT }}" \
+                "PERSISTENCE_MONGO_DB_HOST=${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_HOST }}" \
+                "PERSISTENCE_MONGO_DB_NAME=${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_DB }}" \
+                "PERSISTENCE_MONGO_DB_OPTIONS=${{ vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_OPTIONS }}" \
+                "PERSISTENCE_MONGO_DB_PASS=secretref:db-password" \
+                "MESSAGING_LAVINMQ_HOSTNAME=${{ vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_HOSTNAME }}" \
+                "MESSAGING_LAVINMQ_VHOST=${{ vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_VHOST }}" \
+                "MESSAGING_LAVINMQ_PASS=secretref:mb-password" \
+                "MESSAGING_LAVINMQ_USER=${{ vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_LOGIN }}" \
+                "MESSAGING_LAVINMQ_ASYNCAPI_PATH=${{ vars.HOWESTPRIME_TICKETING_P_ASYNCAPI_URI }}" \
+                "WEBAPI_PORT=${{ vars.HOWESTPRIME_TICKETING_P_WEBAPI_PORT }}" \
+                "WEBAPI_HOST=${{ vars.HOWESTPRIME_TICKETING_P_WEBAPI_HOST }}"
           
-          az containerapp create \
-          --name ${{ env.AZ_CONTAINER_NAME }} \
-          --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
-          --environment ${{ vars.AZ_CONTAINER_ENVIRONMENT }} \
-          --image ${{ vars.AZ_CONTAINER_REGISTRY }}/${{ env.AZ_CONTAINER_NAME }}:${{env.CONTAINER_VERSION_TAG}} \
-          --registry-server ${{ vars.AZ_CONTAINER_REGISTRY }} \
-          --registry-username ${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL }} \
-          --registry-password ${{ secrets.HOWESTPRIME_WIDE_CI_SERVICE_PRINCIPAL_PASSWORD }} \
-          --user-assigned "${{ vars.HOWESTPRIME_WIDE_MI_KEYVAULTREADER_URI}}" \
-          \
-          --secrets \
-          "db-password=keyvaultref:${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_PASSWORD_URI}},identityref:${{vars.HOWESTPRIME_WIDE_MI_KEYVAULTREADER_URI}}" \
-          "mb-password=keyvaultref:${{vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_PASSWORD_URI}},identityref:${{vars.HOWESTPRIME_WIDE_MI_KEYVAULTREADER_URI}}" \
-          \
-          --env-vars \
-          "PERSISTENCE_MONGO_DB_PROTOCOL=${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_PROTOCOL}}" \
-          "PERSISTENCE_MONGO_DB_USER=${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_LOGIN}}" \
-          "PERSISTENCE_MONGO_DB_PORT=${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_PORT}}" \
-          "PERSISTENCE_MONGO_DB_HOST=${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_HOST}}" \
-          "PERSISTENCE_MONGO_DB_NAME=${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_DB}}" \
-          "PERSISTENCE_MONGO_DB_OPTIONS=${{vars.HOWESTPRIME_TICKETING_P_DOCUMENTDB_OPTIONS}}" \
-          "PERSISTENCE_MONGO_DB_PASS=secretref:db-password" \
-          "MESSAGING_LAVINMQ_HOSTNAME=${{vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_HOSTNAME}}" \
-          "MESSAGING_LAVINMQ_VHOST=${{vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_VHOST}}" \
-          "MESSAGING_LAVINMQ_PASS=secretref:mb-password" \
-          "MESSAGING_LAVINMQ_USER=${{vars.HOWESTPRIME_WIDE_P_MESSAGEBROKER_LOGIN}}" \
-          "MESSAGING_LAVINMQ_ASYNCAPI_PATH=${{vars.HOWESTPRIME_TICKETING_P_ASYNCAPI_URI}}" \
-          "WEBAPI_PORT=${{vars.HOWESTPRIME_TICKETING_P_WEBAPI_PORT}}" \
-          "WEBAPI_HOST=${{vars.HOWESTPRIME_TICKETING_P_WEBAPI_HOST}}" \
-         else
-          echo "Container app exists. Updating..."
-           az containerapp update \
+            
+          
+          else
+            echo "Container app exists. Updating..."
+          
+            az containerapp update \
             --name ${{ env.AZ_CONTAINER_NAME }} \
             --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
             --image ${{ vars.AZ_CONTAINER_REGISTRY }}/${{ env.AZ_CONTAINER_NAME }}:${{ env.CONTAINER_VERSION_TAG }}
          fi
           
+          echo "Ensuring ingress is enabled..."
+
           az containerapp ingress enable \
           --name ${{ env.AZ_CONTAINER_NAME }} \
           --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
           --type external \
           --target-port 8000
+
+       
 

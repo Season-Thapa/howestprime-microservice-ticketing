@@ -87,7 +87,7 @@ jobs:
         with:
           login-server: ${{ vars.AZ_CONTAINER_REGISTRY }}
           username: ${{ vars.AZ_USERNAME }}
-          password: ${{ secrets.AZ_PASSWORD}}
+          password: ${{ secrets.AZ_PASSWORD }}
 
       - name: Build and push Docker image
         id: push
@@ -113,11 +113,11 @@ jobs:
       - name: Deploy to Azure Container Apps
         run: |
           set -e
-          
+
           EXISTS=$(az containerapp show \
-          --name ${{ env.AZ_CONTAINER_NAME }} \
-          --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
-          --query name -o tsv 2>/dev/null || true)
+            --name ${{ env.AZ_CONTAINER_NAME }} \
+            --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
+            --query name -o tsv 2>/dev/null || true)
 
           if [ -z "$EXISTS" ]; then
             echo "Container app Creating..."
@@ -151,25 +151,22 @@ jobs:
                 "MESSAGING_LAVINMQ_ASYNCAPI_PATH=${{ vars.HOWESTPRIME_TICKETING_P_ASYNCAPI_URI }}" \
                 "WEBAPI_PORT=${{ vars.HOWESTPRIME_TICKETING_P_WEBAPI_PORT }}" \
                 "WEBAPI_HOST=${{ vars.HOWESTPRIME_TICKETING_P_WEBAPI_HOST }}"
-          
-            
-          
+
           else
             echo "Container app exists. Updating..."
-          
+
             az containerapp update \
-            --name ${{ env.AZ_CONTAINER_NAME }} \
-            --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
-            --image ${{ vars.AZ_CONTAINER_REGISTRY }}/${{ env.AZ_CONTAINER_NAME }}:${{ env.CONTAINER_VERSION_TAG }}
-         fi
-          
+              --name ${{ env.AZ_CONTAINER_NAME }} \
+              --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
+              --image ${{ vars.AZ_CONTAINER_REGISTRY }}/${{ env.AZ_CONTAINER_NAME }}:${{ env.CONTAINER_VERSION_TAG }}
+          fi
+
           echo "Ensuring ingress is enabled..."
 
           az containerapp ingress enable \
-          --name ${{ env.AZ_CONTAINER_NAME }} \
-          --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
-          --type external \
-          --target-port 8000
+            --name ${{ env.AZ_CONTAINER_NAME }} \
+            --resource-group ${{ vars.AZ_RESOURCE_GROUP }} \
+            --type external \
+            --target-port 8000
 
-       
 
